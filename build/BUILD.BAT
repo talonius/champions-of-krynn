@@ -6,11 +6,11 @@ REM  Runs under DOS: Borland's TASM and TPC and Microsoft's EXEPACK emit the two
 REM  files SSI shipped, START.EXE and GAME.OVR, into E:\OBJ under those names.
 REM  TPC reads its settings from E:\SRC\TPC.CFG; /B and output paths are below.
 REM
-REM  Drive letters, assigned by gametools/build.sh. Each tool gets a letter
+REM  Drive letters, assigned by build.sh. Each tool gets a letter
 REM  rather than a PATH entry: the environment is charged against TPC's link.
-REM      C:  drive_c (game data)       E:  the version dir (v12)
+REM      C:  drive_c (game data)       E:  this repository
 REM      D:  TPC.EXE and TURBO.TPL     F:  TASM
-REM      G:  EXEPACK                   H:  this file's directory (v12/build)
+REM      G:  EXEPACK
 REM ==========================================================================
 E:
 CD \SRC
@@ -28,7 +28,7 @@ IF EXIST *.TPU DEL *.TPU
 IF EXIST *.OBJ DEL *.OBJ
 
 REM --- assembly inputs, one line each --------------------------------------
-REM  gametools/build.sh refuses if this list and src/*.asm disagree.
+REM  Keep this list in step with src/*.asm.
 F:\TASM BLIT,E:\OBJ\BLIT          > E:\BUILD\LOGS\TASM.OUT
 F:\TASM JOYSTICK,E:\OBJ\JOYSTICK >> E:\BUILD\LOGS\TASM.OUT
 F:\TASM SNDLOAD,E:\OBJ\SNDLOAD   >> E:\BUILD\LOGS\TASM.OUT

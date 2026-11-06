@@ -1,51 +1,20 @@
-# Python
-__pycache__/
-*.py[cod]
-.venv/
-.pytest_cache/
+# The DOS tools build.sh needs: copied in by hand and never committed.
+/drive_c/
 
-# Per-machine DOSBox helpers (not portable)
-dosbox-x.conf
-start.sh
-
-# Generated build artifacts + extracted copyrighted game bytes (regenerable
-# from GAME.OVR / the build; never commit SSI's shipped bytes to history).
-# ⚠ CASE-SPECIFIC, and that was a real hole: DOS tools emit UPPERCASE, the Python
-# tools emit lowercase, and each pattern only covered one of them. Measured 2026-08-25
-# with `git check-ignore`: `.exe`, `.tpu`, `.ovr`, `.obj`, `.map`, `.DIS` and `.BIN` were
-# ALL committable. `*.OVR`/`*.OBJ`/`*.MAP` had no lowercase form and `*.dis`/`*.bin` had
-# no uppercase form. Nothing had slipped through yet -- the rule is "never commit SSI's
-# shipped bytes", so it must not depend on which tool happened to write the file.
+# Build output. The results are SSI's own files; never commit them.
+/obj/
+/build/logs/
+# Git's patterns are case-sensitive, and DOS tools write upper case.
 *.TPU
 *.tpu
 *.OBJ
 *.obj
-*.OVR
-*.ovr
 *.EXE
 *.exe
+*.OVR
+*.ovr
 *.MAP
 *.map
-*.bin
-*.BIN
-*.dis
-*.DIS
-*.shipped.*
-**/build/logs/
-# Every build output -- EXE, OVR, MAP, TPU, OBJ -- goes to vNN/obj. A directory rule, so
-# the guard rests on neither the extension list above nor case.
-/obj/
-UNPSTART.EXE
 
-# The two DOS mounts are materialized copies -- game media from goldbox-games under
-# drive_c, the pinned DOS toolchain from goldbox-re-tools under drive_d -- and neither is
-# ever committed. Both repos hold proprietary binaries that Brian lands by hand.
-/drive_c/
-/drive_d/
-
-# The checkout's build lock (goldbox.treelock), shared by build.sh and the gate.
-/.build.lock
-
-# agent worktrees (parallel build/RE fan-out)
-.claude/worktrees/
-
+# DOSBox-X captures
+capture/
