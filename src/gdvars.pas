@@ -289,8 +289,12 @@ var
     while it is clear }
   soundActive: Byte;
 
-{ Sound: the intro's sound lock. }
+{ Start-up flags and the intro's sound lock. }
 var
+  { cleared when the game starts; nothing reads it }
+  startupFlagA: Byte;
+  { cleared with startupFlagA; nothing reads it }
+  startupFlagB: Byte;
   { set while the intro owns the sound driver }
   soundDisabled: Byte;
 
@@ -746,10 +750,8 @@ var
   extendedMode: Byte;
   { the undead in the encounter, counted for turning }
   undeadCount: Byte;
-  { the heap top after the Tandy mode setup; later overlays reuse the storage }
-  heapSnapshot: Pointer;
   { unused }
-  heapSnapshotTail: Byte;
+  undeadCountSpare: array[0..4] of Byte;
   { the overlay manager's own read routine, which GameIo's retrying reader calls }
   previousOverlayReadVector: Types.TOverlayReadFunc;
 

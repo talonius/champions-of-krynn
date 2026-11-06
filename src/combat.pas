@@ -20,6 +20,8 @@ uses Types, Blit, Border, GameIo, Crt, CombatAi, CombatSt, CbtActs, ViewChar, Ga
   ClassCal, MenuCore, Pathing, CbtMap, MapTiles, Debug, GDConsts, GDVars, C_Keys, C_Race, C_Ifc, C_Side,
   C_Status, C_Dir, C_Terr, C_Npc, C_Class, C_Init;
 
+procedure OrderCreatures; forward;
+
 procedure CreatureAction(character: Types.PCharRecord); forward;
 
 procedure ManualControl(character: Types.PCharRecord); forward;
@@ -37,8 +39,6 @@ procedure DoneMenu(character: Types.PCharRecord; var done: Boolean); forward;
 procedure SpeedMenu; forward;
 
 procedure TurnOnAuto(character: Types.PCharRecord); forward;
-
-procedure OrderCreatures; forward;
 
 procedure PrimeCombat;
 begin

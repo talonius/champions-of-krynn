@@ -367,7 +367,7 @@ end;
 procedure PushState(v: Byte);
 begin
   GDVars.prevDisk := GDVars.currentDisk;
-  GDVars.currentDisk := (v + 1) div 2;
+  GDVars.currentDisk := (v + 1) shr 1;
 end;
 
 procedure PopState;

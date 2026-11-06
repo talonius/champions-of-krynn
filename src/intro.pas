@@ -11,16 +11,9 @@ interface
   driver and marks the game active. }
 procedure Introduction;
 
-{ Does nothing; nothing calls it. }
-procedure NoopIntro;
-
 implementation
 
 uses Crt, Types, TextRend, Blit, GameIo, SndLoad, Mouse, Border, GDConsts, GDVars, Portrait, C_Sound;
-
-procedure NoopIntro;
-begin
-end;
 
 { Waits up to a number of seconds or until a key is pressed, draining pending keystrokes before and after.
   @param(seconds The longest wait, in seconds.)

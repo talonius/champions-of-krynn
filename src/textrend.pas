@@ -330,7 +330,6 @@ end;
 
 procedure DisplayMessageWindow(ulCol, ulRow, lrCol, lrRow, fg, bg: Byte; clearFirst: Boolean; source: string);
 var
-  { windowWidth is assigned but never read. }
   sourceLength: Byte;
   { Unused in this version; see the other implementations of this routine. }
   windowWidth: Byte;

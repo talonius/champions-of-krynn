@@ -14,21 +14,6 @@ interface
 uses Types, TextRend, Border, GameIo, FxEngine, CharHlp, MenuCore, Debug, GDConsts, GDVars, C_Keys, Crt,
   C_Ifc, C_Screen, C_Npc;
 
-{ Gives the most weight a character can carry: its weight allowance plus 1500.
-  @param(p The character.)
-  @returns(The capacity.) }
-function CarryingCapacity(p: Types.PCharRecord): Word;
-
-{ Takes weight off a character's encumbrance.
-  @param(p The character.)
-  @param(w The weight removed.) }
-procedure RemoveWeight(p: Types.PCharRecord; w: Word);
-
-{ Adds weight to a character's encumbrance.
-  @param(p The character.)
-  @param(w The weight added.) }
-procedure AddWeight(p: Types.PCharRecord; w: Word);
-
 { Tells whether more weight would overload a character.
   @param(p Character to test.)
   @param(w Weight to add.)
@@ -39,10 +24,6 @@ function CheckOverload(p: Types.PCharRecord; w: Word; var takable: Word): Boolea
 { Moves the money of each player character, and of each NPC with the value $B3, into the pool, taking its weight off,
   and marks the pool as holding money. }
 procedure PoolMoney;
-
-{ Counts the party members and animated creatures (NPC value 0 or $B3).
-  @returns(The count.) }
-function CountPoolers: Byte;
 
 { Divides the pool. Each money type's share is the pool divided by CountPoolers, the remainder held back. The first pass
   gives each member with an NPC value below $80, highest money type first, its share and one coin of the remainder while
@@ -55,11 +36,6 @@ procedure ShareMoney;
 { Lists the money in the pool and lets the current character take an amount of the chosen type, until the pool is empty
   or the player leaves. Note: leaving the menu without choosing does not free the list it was built from. }
 procedure TakeMoneyMenu;
-
-{ Gives the current character steel pieces; what it cannot carry goes into the pool, after a pause and a message saying
-  so.
-  @param(pp The amount of steel.) }
-procedure GiveSteel(pp: Word);
 
 { Reads the money type named by the first non-space letter of a menu entry: G gems, P platinum, B bronze, S followed by
   I silver and S otherwise steel, C copper, J jewelry. Note: another letter leaves the result undefined.
@@ -147,16 +123,25 @@ begin
   Debug.PrimeDebug;
 end;
 
+{ Gives the most weight a character can carry: its weight allowance plus 1500.
+  @param(p The character.)
+  @returns(The capacity.) }
 function CarryingCapacity(p: Types.PCharRecord): Word;
 begin
   CarryingCapacity := CharHlp.WeightAllowance(p) + 1500;
 end;
 
+{ Takes weight off a character's encumbrance.
+  @param(p The character.)
+  @param(w The weight removed.) }
 procedure RemoveWeight(p: Types.PCharRecord; w: Word);
 begin
   p^.encumbrance := p^.encumbrance - w;
 end;
 
+{ Adds weight to a character's encumbrance.
+  @param(p The character.)
+  @param(w The weight added.) }
 procedure AddWeight(p: Types.PCharRecord; w: Word);
 begin
   p^.encumbrance := p^.encumbrance + w;
@@ -208,6 +193,9 @@ begin
   GDVars.treasureMoney[4] := gp;
 end;
 
+{ Gives the current character steel pieces; what it cannot carry goes into the pool, after a pause and a message saying
+  so.
+  @param(pp The amount of steel.) }
 procedure GiveSteel(pp: Word);
 var
   takable: Word;
@@ -308,6 +296,8 @@ begin
   end;
 end;
 
+{ Counts the party members and animated creatures (NPC value 0 or $B3).
+  @returns(The count.) }
 function CountPoolers: Byte;
 var
   p: Types.PCharRecord;
@@ -665,14 +655,14 @@ begin
           end;
           { value in steel = plus * K }
           case itemType of
-            37: value := plus * 1250;
-            30: value := plus * 75;
-            32, 33: value := plus * 1500;
-            34: value := plus * 1750;
-            35: value := plus * 2000;
-            36: value := plus * 2500;
-            50: value := plus * 1500;
-            else value := plus * 1000;
+            37: value := Word(plus) * 1250;
+            30: value := Word(plus) * 75;
+            32, 33: value := Word(plus) * 1500;
+            34: value := Word(plus) * 1750;
+            35: value := Word(plus) * 2000;
+            36: value := Word(plus) * 2500;
+            50: value := Word(plus) * 1500;
+            else value := Word(plus) * 1000;
           end;
         end;
       { scrolls }
@@ -726,7 +716,7 @@ begin
                 4: spell := GDConsts.knownSpellTable[1, 4, FxEngine.RollDice(1, 4)];
               end;
             spells[j] := spell;
-            value := r * 150 + value;
+            value := Word(r) * 150 + value;
           end;
           case book of
             2: unidMask := unidMask or $20;

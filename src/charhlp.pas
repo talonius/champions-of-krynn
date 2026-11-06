@@ -83,12 +83,6 @@ function Uint8Str(value: Byte): String;
   @returns(The adjustment.) }
 function DexMissileAdjust(character: Pointer): ShortInt;
 
-{ Computes the Dexterity defensive adjustment from the current Dexterity: -4 at 1..3, -3..-1 at 4..6, +1..+4 at 15..18,
-  4 at 19..20, 5 at 21..23, 6 at 24..25, else 0.
-  @param(character The creature.)
-  @returns(The adjustment.) }
-function DexterityArmorAdjustment(character: Pointer): ShortInt;
-
 { Computes the Strength to-hit bonus on TranslatedStrength's scale (-3 at 1..3 up to +7 at 30), or 0 unless the
   creature's Strength bonus applies.
   @param(character The creature.)
@@ -285,9 +279,6 @@ function HasReadiedHoopak(character: Pointer): Boolean;
 { Calls the priming entry of each overlay this unit uses, so the overlay manager loads them. }
 procedure PrimeCharHlp;
 
-{ Empty routine with no callers. }
-procedure NoopCharHlp;
-
 { Tells whether any party member (a side-0 player or non-player character) is dying. With `applyBandage` set, the first
   dying member found is bandaged: it becomes unconscious, its overkill is cleared and the bandaging is announced.
   @param(applyBandage Set to bandage the first dying member.)
@@ -314,14 +305,14 @@ implementation
 const
   EFF_DETECT_MAGIC = 5;
 
-procedure NoopCharHlp;
-begin
-end;
-
 type
   { the 5-slot AC adjustment array AddItemArmorAdjust mutates: 0 Dexterity, 1 shield, 2 miscellaneous, 3 Ring of
     Protection, 4 body armor or bracers. }
   TAcAdjust = array[0..4] of ShortInt;
+
+function TranslatedStrength(character: Types.PCharRecord): Byte; forward;
+
+function DexterityArmorAdjustment(character: Types.PCharRecord): ShortInt; forward;
 
 procedure PrimeCharHlp;
 begin
@@ -634,7 +625,7 @@ begin
       Inc(displayRow, 2);
       displayColumn := 23;
       CharHlp.PrintItemString(character, Types.PCharRecord(character)^.equipped[0], 0, 0, False, False);
-      TextRend.displayMessageWindow(23, displayRow + 1, 38, displayRow + 1 + 2, LightGreen, Black, True,
+      TextRend.displayMessageWindow(23, displayRow + 1, 38, displayRow + 1 + 1 + 1, LightGreen, Black, True,
                                     Types.PCharRecord(character)^.equipped[0]^.name);
     end;
     displayRow := GDVars.curRow + 1;
@@ -756,7 +747,7 @@ begin
   Types.PCharRecord(character)^.acCur[0] := 0;
   for adjustIndex := 0 to 4 do
     Types.PCharRecord(character)^.acCur[0] := Types.PCharRecord(character)^.acCur[0] + armorAdjustments[adjustIndex];
-  Types.PCharRecord(character)^.acCur[1] := armorAdjustments[4] + armorAdjustments[2] + armorAdjustments[3] - 2;
+  Types.PCharRecord(character)^.acCur[1] := armorAdjustments[4] + armorAdjustments[2] + armorAdjustments[3] - 1 - 1;
   if ((Types.PCharRecord(character)^.classLevels[C_Class.FIGHTER] > 0) or
       ((Types.PCharRecord(character)^.classLevels2[C_Class.FIGHTER] > 0) and
        ClassCal.EarlierClassActive(character)) or
@@ -798,11 +789,15 @@ begin
   Int32Str := resultText;
 end;
 
-function DexterityArmorAdjustment;
+{ Computes the Dexterity defensive adjustment from the current Dexterity: -4 at 1..3, -3..-1 at 4..6, +1..+4 at 15..18,
+  4 at 19..20, 5 at 21..23, 6 at 24..25, else 0.
+  @param(character The creature.)
+  @returns(The adjustment.) }
+function DexterityArmorAdjustment(character: Types.PCharRecord): ShortInt;
 var
   dexterity: Byte;
 begin
-  dexterity := Types.PCharRecord(character)^.stats[C_Stat.DEXTERITY].cur;
+  dexterity := character^.stats[C_Stat.DEXTERITY].cur;
   case dexterity of
     1..3: DexterityArmorAdjustment := -4;
     4..6: DexterityArmorAdjustment := dexterity - 7;
@@ -990,7 +985,7 @@ begin
       windowTop := 17;
     Border.ClearBox(1, windowTop, 38, 22);
     CharHlp.DisplayCreatureName(character, 1, windowTop + 1, False);
-    TextRend.displayMessageWindow(1, windowTop + 2, 38, 22, LightGreen, Black, True, message);
+    TextRend.displayMessageWindow(1, windowTop + 1 + 1, 38, 22, LightGreen, Black, True, message);
   end;
   if effect then begin
     TextRend.pauseOnly;
@@ -1437,7 +1432,7 @@ begin
   while (GDVars.creatureArr[GDVars.targetList[targetPos].creatureIndex] <> target) and
       (targetPos < GDVars.targetCount) do
     Inc(targetPos);
-  CalcDistance := GDVars.targetList[targetPos].distance div 2;
+  CalcDistance := GDVars.targetList[targetPos].distance shr 1;
   Move(savedTargets, GDVars.targetList, SizeOf(GDVars.targetList));
 end;
 

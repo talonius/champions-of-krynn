@@ -41,9 +41,6 @@ procedure RecalcSaves(cr: Types.PCharRecord);
   @param(cr The character to update.) }
 procedure RecalcThiefSkills(cr: Types.PCharRecord);
 
-{ Empty routine with no callers. }
-procedure NoopClassCal;
-
 { Finds the first class in which a human has an earlier (pre-change) level.
   @param(cr The character to check.)
   @returns(That class; 17 for a non-human or when there is none.) }
@@ -69,10 +66,6 @@ function EarlierClassActive(cr: Types.PCharRecord): Boolean;
 procedure PrimeClassCal;
 
 implementation
-
-procedure NoopClassCal;
-begin
-end;
 
 procedure PrimeClassCal;
 begin

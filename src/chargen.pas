@@ -11,12 +11,6 @@ interface
   With the developer keyword as the second parameter, J turns free training on or off. }
 procedure MainMenu;
 
-{ Lists the saved characters and adds the chosen ones to the party until Exit or the party is full (six player
-  characters or eight members). A character already listed with a star, already in the party, a paladin joining evil
-  members, a fourth ranger, or an evil character joining a paladin is refused, the last three with a message. Note: the
-  flag that offers Exit is never set, so whether Exit is offered depends on whatever the local held. }
-procedure AddCharacterMenu;
-
 { Unlinks the current character from the party roster and frees it. Its predecessor, or else the roster head, becomes
   the current character. A character that is not in the roster is left untouched.
   @param(suppressSizeDec True leaves the party size alone.)
@@ -43,32 +37,6 @@ const
   CLASS_CLERIC_MAGE = 11;
   CLASS_CLERIC_THIEF = 12;
   CLASS_FIGHTER_MAGE = 13;
-
-procedure TrainingMenu; forward;
-
-function ClassConHpBonus(cr: Types.PCharRecord; charClass: Byte): Byte; forward;
-
-procedure SetDefaultIcon; forward;
-
-procedure CreateCharacterMenu; forward;
-
-procedure DropCharacterMenu; forward;
-
-procedure ModifyCharacterMenu; forward;
-
-function HpMaximum(cr: Types.PCharRecord): Byte; forward;
-
-function HpMinimum(cr: Types.PCharRecord): Byte; forward;
-
-procedure RollFirstLevelHp(cr: Types.PCharRecord; mask, divisor: Byte); forward;
-
-procedure InitStartingMoney(cr: Types.PCharRecord); forward;
-
-procedure KnightPromotionMenu; forward;
-
-procedure InitMouseJoystick; forward;
-
-procedure CalibrateJoystickInWindow; forward;
 
 procedure PrimeCharGen;
 begin
@@ -113,6 +81,36 @@ begin
   FreeMem(cr, SizeOf(Types.TCharRecord));
   cr := nil;
 end;
+
+procedure CreateCharacterMenu; forward;
+
+function ConHpBonus(charClass: Byte): ShortInt; forward;
+
+procedure DropCharacterMenu; forward;
+
+procedure ModifyCharacterMenu; forward;
+
+procedure AddCharacterMenu; forward;
+
+procedure RollFirstLevelHp(cr: Types.PCharRecord; mask, divisor: Byte); forward;
+
+procedure TrainingMenu; forward;
+
+procedure InitStartingMoney(cr: Types.PCharRecord); forward;
+
+procedure AdvanceKnightOrder(cr: Types.PCharRecord); forward;
+
+procedure KnightPromotionMenu; forward;
+
+procedure InitMouseJoystick; forward;
+
+procedure CalibrateJoystickInWindow; forward;
+
+function HpMinimum(cr: Types.PCharRecord): Byte; forward;
+
+function HpMaximum(cr: Types.PCharRecord): Byte; forward;
+
+procedure SetDefaultIcon; forward;
 
 procedure MainMenu;
 var
@@ -1153,6 +1151,10 @@ begin
   GDVars.modifyActive := 0
 end;
 
+{ Lists the saved characters and adds the chosen ones to the party until Exit or the party is full (six player
+  characters or eight members). A character already listed with a star, already in the party, a paladin joining evil
+  members, a fourth ranger, or an evil character joining a paladin is refused, the last three with a message. Note: the
+  flag that offers Exit is never set, so whether Exit is offered depends on whatever the local held. }
 procedure AddCharacterMenu;
 var
   list: Types.PCharacterListNode;
@@ -1486,11 +1488,6 @@ begin
     key := MenuCore.YesNoMenu('Is this icon ok? ', LightMagenta, LightGreen, White)
   until key = 'Y';
   CbtMap.SetNoncombatPalette
-end;
-
-{ Empty routine with no callers. }
-procedure NoopCharGen;
-begin
 end;
 
 { Looks up a creature's Constitution hit-point bonus for one class from conHpTable; a fighter, knight or ranger gets 1

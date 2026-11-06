@@ -15,18 +15,6 @@ uses Types, Blit, DaxIo, Mouse, TextRend, Border, GameIo, Debug, Crt, GDConsts, 
   @param(image The picture.) }
 procedure DisplayImageBuf(col, row: Integer; compositeAnimation: Boolean; image: Types.PImgBuf);
 
-{ Draws a portrait head straight to the screen.
-  @param(col Column of the head's upper-left character cell.)
-  @param(row Row of the head's upper-left character cell.)
-  @param(image The head picture; nil draws nothing.) }
-procedure DisplayPortraitHead(col, row: Byte; image: Types.PImgBuf);
-
-{ Draws a portrait body straight to the screen, five character rows below the head drawn at the same cell.
-  @param(col Column of the head's upper-left character cell.)
-  @param(row Row of the head's upper-left character cell.)
-  @param(image The body picture; nil draws nothing.) }
-procedure DisplayPortraitBody(col, row: Byte; image: Types.PImgBuf);
-
 { Loads picture picId of <archiveName><disk>.DAX into an animation, one image buffer per frame, freeing what the
   animation held; nothing happens when that picture is the one last loaded, or for picId 255. PIC and FINAL pictures
   store each frame after the first as an XOR difference from it, and load only their first frame while animations are
@@ -95,11 +83,19 @@ begin
     end;
 end;
 
+{ Draws a portrait head straight to the screen.
+  @param(col Column of the head's upper-left character cell.)
+  @param(row Row of the head's upper-left character cell.)
+  @param(image The head picture; nil draws nothing.) }
 procedure DisplayPortraitHead(col, row: Byte; image: Types.PImgBuf);
 begin
   Portrait.DisplayImageBuf(col, row, False, image);
 end;
 
+{ Draws a portrait body straight to the screen, five character rows below the head drawn at the same cell.
+  @param(col Column of the head's upper-left character cell.)
+  @param(row Row of the head's upper-left character cell.)
+  @param(image The body picture; nil draws nothing.) }
 procedure DisplayPortraitBody(col, row: Byte; image: Types.PImgBuf);
 begin
   Portrait.DisplayImageBuf(col, row + 5, False, image);

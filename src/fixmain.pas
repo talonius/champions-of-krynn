@@ -1,6 +1,6 @@
 { The main program: the title menu, character generation, the copy-protection check and the game loop, repeated until
   the player quits. }
-{$F+,O+,I-,R-,S-}
+{$F+,O-,I-,R-,S-}
 program FixMain;
 
 uses
@@ -99,7 +99,7 @@ begin
   if ParamStr(1) <> 'Woof' then Introduction;
   StartSound;
   GDVars.autoTimeout := 3000; GDVars.timerCh := 'D';
-  GDVars.menuSelection := MenuHorizontal('Champions of Krynn v1.1', 'Play Demo', LightMagenta,
+  GDVars.menuSelection := MenuHorizontal('Champions of Krynn v1.2', 'Play Demo', LightMagenta,
                                   LightGreen, White, False, False, GDVars.extendedKey);
   GDVars.autoTimeout := 0; GDVars.timerCh := #0;
   if GDVars.menuSelection = 'D' then GDVars.demoFlag := 1;
@@ -142,7 +142,7 @@ begin
       StartSound;
       FlushKeys;
       GDVars.autoTimeout := 1000; GDVars.timerCh := 'D';
-      GDVars.menuSelection := MenuHorizontal('Champions Of Krynn v1.1', 'Play Demo', LightMagenta, LightGreen, White,
+      GDVars.menuSelection := MenuHorizontal('Champions Of Krynn v1.2', 'Play Demo', LightMagenta, LightGreen, White,
                                       False, False, GDVars.extendedKey);
       GDVars.autoTimeout := 0; GDVars.timerCh := #0;
       GDVars.demoFlag := Ord(GDVars.menuSelection = 'D');

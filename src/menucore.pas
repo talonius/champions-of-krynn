@@ -13,11 +13,6 @@ uses Types, Crt, TextRend, GameIo, Mouse, Joystick, Border, Portrait, CbtMap, De
   @returns(The member, or nil when the list is shorter.) }
 function FindListMember(n: Integer; list: Types.PItemRec): Types.PItemRec;
 
-{ Counts the members of a string list.
-  @param(list The list's first member, or nil.)
-  @returns(The number of members.) }
-function ListCount(list: Types.PItemRec): Integer;
-
 { Shows query and a one-line menu on the bottom row and waits for a choice. Each option starts at a digit or capital
   letter, its hotkey, drawn in hlCol; the highlighted option (horizontalChoice, kept between calls) is drawn inverse.
   With several options the left and right arrows, or 4 and 6, move the highlight, wrapping; any other extended key is
@@ -46,11 +41,10 @@ procedure ClearBottomLine;
 { Runs a menu over a string list in a window. Members with inUse set are labels, drawn in qCol and skipped by the
   highlight; the others are choices, drawn in mCol. A horizontal menu on the bottom row (MenuHorizontal) takes the
   command: menu's options, then Next when a later page exists, Prev when the page top is past the leading labels, and
-  Exit with addExit. The up and down arrows move the highlight, wrapping within the page; Page Up and Page Down turn
-  pages when Prev and Next are offered, P and N whether or not they are; a mouse click on a row moves the highlight
-  there. The page top (firstVisibleIndex) is kept between calls; it is pulled back to idx when it lies past it, and to 0
-  when it lies past the end of the list. horizontalChoice starts at 1. Note: the highlight wraps within the page without
-  checking the end of the list, so on a short last page it can move past the last member.
+  Exit with addExit. The up and down arrows move the highlight, wrapping within the page and the list; Page Up and Page
+  Down turn pages when Prev and Next are offered, P and N whether or not they are; a mouse click on a row moves the
+  highlight there. The page top (firstVisibleIndex) is kept between calls; it is pulled back to idx when it lies past
+  it, and to 0 when it lies past the end of the list. horizontalChoice starts at 1.
   @param(query Text shown before the command menu.)
   @param(menu The command menu's own options.)
   @param(qCol Color of the query and the labels.)
@@ -120,6 +114,9 @@ begin
     FindListMember := nil;
 end;
 
+{ Counts the members of a string list.
+  @param(list The list's first member, or nil.)
+  @returns(The number of members.) }
 function ListCount(list: Types.PItemRec): Integer;
 var
   p: Types.PItemRec;
@@ -579,6 +576,8 @@ var
         Inc(idx);
         if GDVars.firstVisibleIndex + rows - 1 < idx then
           idx := GDVars.firstVisibleIndex;
+        if count - 1 < idx then
+          idx := GDVars.firstVisibleIndex;
       end;
     end else
       while (k < rows) and (MenuCore.FindListMember(idx, list)^.inUse <> 0) do begin
@@ -586,6 +585,8 @@ var
         Dec(idx);
         if idx < GDVars.firstVisibleIndex then
           idx := GDVars.firstVisibleIndex + rows - 1;
+        if count - 1 < idx then
+          idx := count - 1;
       end;
   end;
 
@@ -623,10 +624,14 @@ var
       Inc(idx);
       if GDVars.firstVisibleIndex + rows - 1 < idx then
         idx := GDVars.firstVisibleIndex;
+      if count - 1 < idx then
+        idx := GDVars.firstVisibleIndex;
     end else begin
       Dec(idx);
       if idx < GDVars.firstVisibleIndex then
         idx := GDVars.firstVisibleIndex + rows - 1;
+      if count - 1 < idx then
+        idx := count - 1;
     end;
     SkipLabels(down);
   end;

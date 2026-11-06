@@ -87,29 +87,6 @@ function CreatureCoinValueInSteel(cr: Types.PCharRecord): LongInt;
   @returns(The spell picked, or 0.) }
 function SpellMenu(menuType, selType: Byte; var idx: Integer; var notEmpty: Boolean): Byte;
 
-{ Always refuses: laying on hands is not offered.
-  @param(cr Unused.)
-  @returns(False.) }
-function CanHeal(cr: Types.PCharRecord): Boolean;
-
-{ Always refuses: curing disease is not offered.
-  @param(cr Unused.)
-  @returns(False.) }
-function CanCure(cr: Types.PCharRecord): Boolean;
-
-{ Empty: laying on hands does nothing.
-  @param(cr Unused.) }
-procedure PaladinLayOnHands(cr: Types.PCharRecord);
-
-{ Empty: curing disease does nothing.
-  @param(cr Unused.) }
-procedure PaladinCureDisease(cr: Types.PCharRecord);
-
-{ Shows an item's raw fields (type, name parts, plus, readiness, identification, curse, value, specials, missile type,
-  range and slot) on a debug screen and waits for a key.
-  @param(it The item.) }
-procedure ViewItemDetail(it: Types.PItemRec);
-
 { Calls the priming entries of MenuCore, Portrait, Magic, FxEngine, Money, GameTime, MapView, CharHlp, ClassCal and the
   trace overlay, so the overlay manager loads them; CbtMap, which this unit also uses, is not primed. }
 procedure PrimeViewChar;
@@ -134,6 +111,14 @@ procedure IdentifyItem(it: Types.PItemRec; var newInfo: Boolean); forward;
 procedure TradeTreasureMenu; forward;
 
 procedure DropMoneyMenu; forward;
+
+function CanHeal(cr: Types.PCharRecord): Boolean; forward;
+
+function CanCure(cr: Types.PCharRecord): Boolean; forward;
+
+procedure PaladinLayOnHands(cr: Types.PCharRecord); forward;
+
+procedure PaladinCureDisease(cr: Types.PCharRecord); forward;
 
 procedure PrimeViewChar;
 begin
@@ -423,6 +408,9 @@ begin
   Border.ClearBox(1, 21, 38, 22);
 end;
 
+{ Shows an item's raw fields (type, name parts, plus, readiness, identification, curse, value, specials, missile type,
+  range and slot) on a debug screen and waits for a key.
+  @param(it The item.) }
 procedure ViewItemDetail(it: Types.PItemRec);
 begin
   Border.DrawWindowFrame(True);
@@ -1161,6 +1149,9 @@ begin
     SpellMenu := 0;
 end;
 
+{ Always refuses: laying on hands is not offered.
+  @param(cr Unused.)
+  @returns(False.) }
 function CanHeal(cr: Types.PCharRecord): Boolean;
 var
   { Unused in this version; see the other implementations of this routine. }
@@ -1169,11 +1160,16 @@ begin
   CanHeal := False;
 end;
 
+{ Always refuses: curing disease is not offered.
+  @param(cr Unused.)
+  @returns(False.) }
 function CanCure(cr: Types.PCharRecord): Boolean;
 begin
   CanCure := False;
 end;
 
+{ Empty: laying on hands does nothing.
+  @param(cr Unused.) }
 procedure PaladinLayOnHands(cr: Types.PCharRecord);
 var
   { Unused in this version; see the other implementations of this routine. }
@@ -1181,6 +1177,8 @@ var
 begin
 end;
 
+{ Empty: curing disease does nothing.
+  @param(cr Unused.) }
 procedure PaladinCureDisease(cr: Types.PCharRecord);
 var
   { Unused in this version; see the other implementations of this routine. }

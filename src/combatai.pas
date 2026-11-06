@@ -26,9 +26,16 @@ const
 
 function TurnUndeadAi(character: Types.PCharRecord): Boolean; forward;
 
+function DecideCastSpell(character: Types.PCharRecord; spellId, minimumPriority: Byte): Boolean; forward;
+
 function SelectItemToUse(character: Types.PCharRecord): Boolean; forward;
 
 function SelectSpellToCast(character: Types.PCharRecord): Boolean; forward;
+
+function AiCanStep(character: Types.PCharRecord; attempt, baseDirection: Byte;
+                   var leavesMap: Boolean): Boolean; forward;
+
+procedure AiMoveStep(character: Types.PCharRecord); forward;
 
 function AiMoveAttack(character: Types.PCharRecord): Boolean; forward;
 
@@ -38,9 +45,9 @@ function CheckKeystroke(character: Types.PCharRecord): Boolean; forward;
 
 function CheckMorale(character: Types.PCharRecord): Boolean; forward;
 
-procedure EquipWeaponAndArmor(character: Types.PCharRecord); forward;
+function CalcWeaponPriority(character: Types.PCharRecord; item: Types.PItemRec): Byte; forward;
 
-function DecideCastSpell(character: Types.PCharRecord; spellId, minimumPriority: Byte): Boolean; forward;
+procedure EquipWeaponAndArmor(character: Types.PCharRecord); forward;
 
 procedure PrimeCombatAi;
 begin
@@ -182,13 +189,6 @@ begin
       end;
   end;
 end;
-
-function AiCanStep(character: Types.PCharRecord; attempt, baseDirection: Byte;
-                   var leavesMap: Boolean): Boolean; forward;
-
-procedure AiMoveStep(character: Types.PCharRecord); forward;
-
-function CalcWeaponPriority(character: Types.PCharRecord; item: Types.PItemRec): Byte; forward;
 
 { Uses an equipped item's spell when the creature may use items, an enemy team remains and there is no antimagic. Over
   1d7 passes the lowest AI priority accepted falls from 7, and the first equipped item that is not readable, has a
@@ -397,7 +397,7 @@ begin
     else begin
       character^.combatAddr^.aiStance := FxEngine.RollDice(1, 2);
       { run against the party's facing, cardinalized }
-      direction := GDVars.mapState.facing - ((GDVars.mapState.facing + 2) mod 4) div 2;
+      direction := GDVars.mapState.facing - Word((GDVars.mapState.facing + 2) mod 4) div 2;
       if character^.hostile = C_Side.PLAYER then
         { allies flee the other way }
         direction := direction + 4;

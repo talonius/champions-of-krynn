@@ -25,15 +25,14 @@ const
   SOUND_ADLIB = 2;
 
 type
-  { FreePtr, read as words }
+  { HeapEnd, read as words }
   THeapEndWords = record
     offset: Word;
     segment: Word;
   end;
-  TFreeBlockPrefix = array[0..7] of Byte;
 
 var
-  heapEndWords: THeapEndWords absolute FreePtr;
+  heapEndWords: THeapEndWords absolute HeapEnd;
 
   { GDVars.dataPath as the DirStr FSplit takes }
   fsDir: DirStr absolute GDVars.dataPath;
@@ -169,13 +168,9 @@ begin
     'T': begin
       GDVars.displayMode := Types.Tandy;
       GDVars.gfxReserve := Ptr(heapEndWords.segment - GameBoot.GFX_RESERVE_PARAS, heapEndWords.offset);
-      { The free list sits at the top of the heap: copy the 8 bytes at FreePtr below the reservation, point FreePtr
-        there, and after the mode switch set FreeMin to $50. }
-      Move(FreePtr^, GDVars.gfxReserve^, SizeOf(TFreeBlockPrefix));
-      FreePtr := GDVars.gfxReserve;
+      { Lower HeapEnd so the heap stays clear of the top $400 paragraphs. }
+      HeapEnd := GDVars.gfxReserve;
       Blit.SetVideoMode(GameBoot.BIOS_MODE_TANDY);
-      FreeMin := 80;
-      GDVars.heapSnapshot := FreePtr;
     end;
     else begin
       GDVars.displayMode := Types.Cga;

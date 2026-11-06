@@ -69,39 +69,6 @@ procedure DisplayMonster(spriteId, pictureId, distance: Byte; var monsterFlags: 
   @returns(The high byte times 256 plus the low byte.) }
 function CombineBytesToWord(lowByte, highByte: Byte): Word;
 
-{ Turns a 6-bit game character into ASCII: codes below 32 gain 64, and higher codes stay as they are.
-  @param(charCode The game character.)
-  @returns(The ASCII character.) }
-function DecodeGameCharacter(charCode: Byte): Char;
-
-{ Finds the GBVM zone holding an address; the ranges are tested in order, so a later one wins.
-  @param(address The GBVM address.)
-  @returns(The zone, 0..3 (3 is the script), or 4 for an address outside the zones.) }
-function GbvmZone(address: Word): Byte;
-
-{ Finds a creature's place in the creature list.
-  @param(character The creature.)
-  @returns(Its place from 0; the list's length when it is not there.) }
-function FindCurCharIdx(character: Types.PCharRecord): Byte;
-
-{ Reads the zone-1 addresses that map onto the current character: Intelligence, Constitution, Charisma, knight order,
-  race, class, maximum hit points, a saving throw, highest level, thief skills, NPC byte, coins, magic-user level
-  (counting an earlier class once passed), fighter, knight and ranger levels, gender, alignment, experience fields,
-  status ($100: 1 okay up to 7 stoned, or 0 after a character-not-found), side and quick fight ($10C), hit points,
-  movement, party position, a Charisma value (0..60), the current disk and the party size.
-  @param(address The zone-1 address.)
-  @param(found Set False for an ordinary zone-1 word, else True.)
-  @returns(The value; undefined for $10D and for an ordinary word.) }
-function SpecialReadZ1(address: Word; var found: Boolean): Word;
-
-{ Applies the side effects of a zone-1 write to the current character: clearing its name (0 at the zone's base),
-  memorized spells, NPC byte (values above $B2 lowered by 50), coins, experience fields, status (1 makes it okay and in
-  play), side and quick fight, hit points, the current disk (PushState), and the three wall sets (values above $80, less
-  bit 7).
-  @param(address The zone-1 address.)
-  @param(value The value written.) }
-procedure SpecialWriteZ1(address, value: Word);
-
 { Writes a GBVM word. A zone-0 write to a sky color asks for a sky redraw, and one that changes the 3D flag switches
   between the overland and 3D interface states, remembering the previous one; zone-1 writes go on to SpecialWriteZ1.
   Outside the zones, the addresses that do anything are the sound effect, two script registers, and from $BF68 up the
@@ -122,18 +89,6 @@ function ReadGbvm(address: Word): Word;
   @param(address The GBVM address.)
   @param(value The string.) }
 procedure WriteGbvmString(address: Word; value: String);
-
-{ Decodes packed 6-bit game characters at the script's instruction pointer into a script string, four characters to
-  three bytes; zero characters are dropped. The instruction pointer ends on the last byte read.
-  @param(textLength The number of packed bytes.)
-  @param(stringIndex The script string to fill.) }
-procedure ConvGbString(textLength, stringIndex: Byte);
-
-{ Copies the zero-terminated string at a GBVM address into a script string. The zone-1 base address gives the current
-  character's name; addresses outside the zones give an empty string.
-  @param(stringIndex The script string filled.)
-  @param(address The GBVM address.) }
-procedure DerefGbString(stringIndex: Byte; address: Word);
 
 { Runs a horizontal menu with ~ hotkeys; extended keys select the previous or next character.
   @param(query The prompt.)
@@ -230,6 +185,10 @@ const
   GBVM_REST_SAFE_TIME = $7ED2;
   GBVM_REST_INTERRUPT = $7ED3;
   GBVM_PIC_LOADING = $7EE1;
+
+procedure ConvGbString(textLength, stringIndex: Byte); forward;
+
+procedure DerefGbString(stringIndex: Byte; address: Word); forward;
 
 procedure PrimeEclMenu;
 begin
@@ -469,6 +428,9 @@ begin
   CombineBytesToWord := highByte * 256 + lowByte;
 end;
 
+{ Turns a 6-bit game character into ASCII: codes below 32 gain 64, and higher codes stay as they are.
+  @param(charCode The game character.)
+  @returns(The ASCII character.) }
 function DecodeGameCharacter(charCode: Byte): Char;
 begin
   if charCode > 31 then
@@ -477,6 +439,9 @@ begin
     DecodeGameCharacter := Chr(charCode + 64);
 end;
 
+{ Finds the GBVM zone holding an address; the ranges are tested in order, so a later one wins.
+  @param(address The GBVM address.)
+  @returns(The zone, 0..3 (3 is the script), or 4 for an address outside the zones.) }
 function GbvmZone(address: Word): Byte;
 begin
   GbvmZone := 4;
@@ -486,6 +451,9 @@ begin
   if (address >= C_Gbvm.ZONE3_BASE) and (address <= C_Gbvm.ZONE3_TOP) then GbvmZone := 3;
 end;
 
+{ Finds a creature's place in the creature list.
+  @param(character The creature.)
+  @returns(Its place from 0; the list's length when it is not there.) }
 function FindCurCharIdx(character: Types.PCharRecord): Byte;
 var
   index: Byte;
@@ -506,6 +474,14 @@ begin
   FindCurCharIdx := index;
 end;
 
+{ Reads the zone-1 addresses that map onto the current character: Intelligence, Constitution, Charisma, knight order,
+  race, class, maximum hit points, a saving throw, highest level, thief skills, NPC byte, coins, magic-user level
+  (counting an earlier class once passed), fighter, knight and ranger levels, gender, alignment, experience fields,
+  status ($100: 1 okay up to 7 stoned, or 0 after a character-not-found), side and quick fight ($10C), hit points,
+  movement, party position, a Charisma value (0..60), the current disk and the party size.
+  @param(address The zone-1 address.)
+  @param(found Set False for an ordinary zone-1 word, else True.)
+  @returns(The value; undefined for $10D and for an ordinary word.) }
 function SpecialReadZ1(address: Word; var found: Boolean): Word;
 var
   fieldIndex: Byte;
@@ -593,6 +569,12 @@ begin
   end;
 end;
 
+{ Applies the side effects of a zone-1 write to the current character: clearing its name (0 at the zone's base),
+  memorized spells, NPC byte (values above $B2 lowered by 50), coins, experience fields, status (1 makes it okay and in
+  play), side and quick fight, hit points, the current disk (PushState), and the three wall sets (values above $80, less
+  bit 7).
+  @param(address The zone-1 address.)
+  @param(value The value written.) }
 procedure SpecialWriteZ1(address, value: Word);
 var
   fieldIndex: Byte;
@@ -788,7 +770,7 @@ begin
             if GDVars.zone0^.vars[C_Gbvm.VIEW_3D] = 0 then
               ReadGbvm := GDVars.mapState.facing
             else
-              ReadGbvm := Word(GDVars.mapState.facing) div 2;
+              ReadGbvm := GDVars.mapState.facing div 2;
           3: ReadGbvm := GDVars.mapState.wallAhead;
           4: ReadGbvm := GDVars.mapState.event;
           { $C059: empty (write-only) }
@@ -838,6 +820,10 @@ begin
   end;
 end;
 
+{ Decodes packed 6-bit game characters at the script's instruction pointer into a script string, four characters to
+  three bytes; zero characters are dropped. The instruction pointer ends on the last byte read.
+  @param(textLength The number of packed bytes.)
+  @param(stringIndex The script string to fill.) }
 procedure ConvGbString(textLength, stringIndex: Byte);
 var
   index: Byte;
@@ -888,6 +874,10 @@ begin
   end;
 end;
 
+{ Copies the zero-terminated string at a GBVM address into a script string. The zone-1 base address gives the current
+  character's name; addresses outside the zones give an empty string.
+  @param(stringIndex The script string filled.)
+  @param(address The GBVM address.) }
 procedure DerefGbString(stringIndex: Byte; address: Word);
 var
   gbvmRegion: Byte;

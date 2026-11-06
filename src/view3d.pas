@@ -6,21 +6,12 @@ interface
 
 uses Types, GDConsts, GDVars, Blit, DaxIo, GameIo, Sym8x8, Debug, C_Dir, C_Gbvm;
 
-{ Empty routine with no callers. }
-procedure NoopThreeDViewA;
-
 { Stores the four 3D view band colors: sky, the two horizon bands and floor.
   @param(skyColor The sky color.)
   @param(horizonUpper The first horizon band's color.)
   @param(horizonLower The second horizon band's color.)
   @param(floorColor The floor color.) }
 procedure SetView3DColors(skyColor, horizonUpper, horizonLower, floorColor: Byte);
-
-{ Paints the 3D view's background into the view buffer in the recorded colors; CGA uses its own bands. Outside CGA,
-  under an open sky (a cell event below $80 and a light cyan sky) it draws the sun (edgeTile) by the clock's hour when
-  the party faces east, south or west, and the north sky picture (frontTile) when it faces north; then it draws the
-  horizon picture (skyTile). }
-procedure DrawBackdrop;
 
 { Reads the wall type on one side of a cell: north and east share one map plane and south and west another, one nibble
   each. Off-map coordinates wrap around the 16x16 map, except in scripts 0 and 80, where they give 0.
@@ -69,21 +60,10 @@ procedure LoadWallSet(fileId, wallSetSlot: Byte);
   @param(mapId The block to load.) }
 procedure Load3DMap(mapId: Byte);
 
-{ Empty routine with no callers. }
-procedure NoopThreeDViewB;
-
 { Calls the priming entry of each overlay this unit uses, so the overlay manager loads them. }
 procedure PrimeView3D;
 
 implementation
-
-procedure NoopThreeDViewA;
-begin
-end;
-
-procedure NoopThreeDViewB;
-begin
-end;
 
 const
   { party arrow symbols, one per facing / 2 }
@@ -150,6 +130,10 @@ begin
   GDVars.viewColFloor := floorColor;
 end;
 
+{ Paints the 3D view's background into the view buffer in the recorded colors; CGA uses its own bands. Outside CGA,
+  under an open sky (a cell event below $80 and a light cyan sky) it draws the sun (edgeTile) by the clock's hour when
+  the party faces east, south or west, and the north sky picture (frontTile) when it faces north; then it draws the
+  horizon picture (skyTile). }
 procedure DrawBackdrop;
 var
   borderWall: Word;
@@ -295,10 +279,8 @@ var
   reverseFacing: Byte;
   currentX: Integer;
   currentY: Integer;
-  { signed }
-  forwardDeltaX: Integer;
-  { signed }
-  forwardDeltaY: Integer;
+  forwardDeltaX: Word;
+  forwardDeltaY: Word;
   wallX: Integer;
   wallY: Integer;
   side: Byte;

@@ -22,17 +22,6 @@ type
   @param(files Receives the matching file names, in the same order.) }
 procedure LoadCharlist(var list, files: Types.PCharacterListNode);
 
-{ Makes sure the save directory can be reached in import format 0: while the game disk (volume CHAMP) sits in a floppy
-  save drive it asks for the save disk; a missing directory is created, on a floppy after asking whether the save disk
-  is in. An unexpected error on a hard disk is reported and fails.
-  @returns(True when the directory is ready.) }
-function CheckSaveDir: Boolean;
-
-{ ORs one icon's pixels into another and ANDs its transparency mask into the other's.
-  @param(src The icon to add.)
-  @param(dst The icon that receives it.) }
-procedure MergeIcon(src, dst: Types.PImgBuf);
-
 { Builds the current character's combat icon in its slot (on disk 1): loads the head (CHEAD) icon into scratch slot 11
   and the body (CBODY) icon into the slot, both for its icon size, ORs the head's two frames onto the body's and,
   outside CGA, recolors color 8 to 0 in each; then frees slot 11 and discards pending keys.
@@ -94,6 +83,8 @@ procedure PrimeSaveLoad;
 implementation
 
 uses CharGen;
+
+function CheckSaveDir: Boolean; forward;
 
 procedure PrimeSaveLoad;
 begin
@@ -208,6 +199,10 @@ begin
   end;
 end;
 
+{ Makes sure the save directory can be reached in import format 0: while the game disk (volume CHAMP) sits in a floppy
+  save drive it asks for the save disk; a missing directory is created, on a floppy after asking whether the save disk
+  is in. An unexpected error on a hard disk is reported and fails.
+  @returns(True when the directory is ready.) }
 function CheckSaveDir: Boolean;
 var
   errorCode: Integer;
@@ -252,6 +247,9 @@ begin
   CheckSaveDir := True;
 end;
 
+{ ORs one icon's pixels into another and ANDs its transparency mask into the other's.
+  @param(src The icon to add.)
+  @param(dst The icon that receives it.) }
 procedure MergeIcon(src, dst: Types.PImgBuf);
 var
   { Unused in this version; see the other implementations of this routine. }
@@ -672,7 +670,7 @@ begin
   BlockRead(saveFile, characterCount, SizeOf(characterCount), bytesRead);
   BlockRead(saveFile, characterNames, SizeOf(characterNames), bytesRead);
   Close(saveFile);
-  GDVars.picturesEnabled := GDVars.zone0^.vars[$4BFF] div 2;
+  GDVars.picturesEnabled := GDVars.zone0^.vars[$4BFF] shr 1;
   GDVars.animationsEnabled := GDVars.zone0^.vars[$4BFF] and $01;
   GDVars.gameDelay := Lo(GDVars.zone0^.vars[$4BFC]);
   GDVars.zone1^.vars[C_Gbvm.PARTY_SIZE] := 0;
@@ -727,11 +725,6 @@ var
   saveSlot: Char;
   errorCode: Integer;
   requiredBytes: Word;
-
-  { Empty routine with no callers. }
-  procedure Noop;
-  begin
-  end;
 
   { Returns the bytes the members' files need: a record each plus its items and effects. }
   function ComputePartySaveSize: Word;

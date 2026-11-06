@@ -6,9 +6,6 @@ interface
 
 uses Types, Blit, TextRend, SoundDrv, Crt, MapTiles, Debug, GDConsts, GDVars, C_Ifc, C_Terr, C_Status;
 
-{ Empty routine with no callers. }
-procedure NoopCbtMap;
-
 { Finds where one tile of a creature icon lies relative to the icon's upper-left cell.
   @param(iconSize The icon size; 0 for no icon.)
   @param(tileIndex The tile, 0 to 3.)
@@ -17,20 +14,11 @@ procedure NoopCbtMap;
   @returns(True when the icon uses the tile; False for size 0 or an unused tile, whose column offset is negative.) }
 function GetIconTileDelta(iconSize, tileIndex: Byte; var deltaX, deltaY: ShortInt): Boolean;
 
-{ Recomputes each arena creature's view coordinates from its arena cell and the view's upper-left cell. }
-procedure CalcGridDeltas;
-
 { Empty: the palette is left as it is for combat. }
 procedure SetCombatPalette;
 
 { Empty: the palette is left as it is after combat. }
 procedure SetNoncombatPalette;
-
-{ Repaints the terrain under the cursor's footprint at an arena cell, draws the cursor there when it is on, then redraws
-  the creature standing on the cell if it is visible.
-  @param(x Arena column of the cell.)
-  @param(y Arena row of the cell.) }
-procedure DrawCursorCell(x, y: ShortInt);
 
 { Redraws one arena cell: repaints its terrain (the whole icon footprint when a creature stands there, through
   UpdateCombatMapTile), then the creature's sprite if it is visible.
@@ -152,10 +140,6 @@ procedure PrimeCbtMap;
 
 implementation
 
-procedure NoopCbtMap;
-begin
-end;
-
 const
   { iconAnims row holding the two corpse ("skull") frames }
   DOWNED_ANIMATION = 24;
@@ -176,6 +160,7 @@ begin
     GetIconTileDelta := True;
 end;
 
+{ Recomputes each arena creature's view coordinates from its arena cell and the view's upper-left cell. }
 procedure CalcGridDeltas;
 var
   i: Byte;
@@ -194,6 +179,10 @@ procedure SetNoncombatPalette;
 begin
 end;
 
+{ Repaints the terrain under the cursor's footprint at an arena cell, draws the cursor there when it is on, then redraws
+  the creature standing on the cell if it is visible.
+  @param(x Arena column of the cell.)
+  @param(y Arena row of the cell.) }
 procedure DrawCursorCell(x, y: ShortInt);
 var
   viewX: ShortInt;

@@ -20,8 +20,8 @@ CODE    SEGMENT BYTE PUBLIC             ; no class, so it merges into the unit c
 
 ; The handler's state: the INT 8 handler it replaced, the ticks left until the next chained tick, and the flag that
 ; keeps a slow driver tick from being entered again.
-oldInt8         dd      00080000h
-chainCountdown  dw      0014h
+oldInt8         dd      0
+chainCountdown  dw      0
 inDriverTick    db      0
 
 ; InstallTimer -- save the old INT 8 vector, point INT 8 at timerHandler and raise PIT channel 0 to the 5555h reload.
@@ -110,7 +110,7 @@ timerHandler:
         jmp     countTick
 enterDriver:
         mov     byte ptr cs:[inDriverTick],1
-        mov     ax,DATA
+        mov     ax,DGROUP
         mov     ds,ax
         mov     ah,0
         call    dword ptr [DRIVERENTRYPTR]

@@ -10,9 +10,6 @@ unit GameTime;
 
 interface
 
-{ Empty routine with no callers. }
-procedure NoopGameTime;
-
 { Advances the game clock one unit at a time, carrying each component into the next, then ages the party's timed effects
   by the same span.
   @param(amount Number of units.)
@@ -33,10 +30,6 @@ procedure PrimeGameTime;
 implementation
 
 uses Types, TextRend, GameIo, Magic, FxEngine, CharHlp, MenuCore, Debug, Sym8x8, Crt, GDConsts, GDVars, C_Keys, C_Ifc;
-
-procedure NoopGameTime;
-begin
-end;
 
 procedure PrimeGameTime;
 begin
@@ -100,6 +93,7 @@ var
   found: Boolean;
   tail: Types.PEffectRec;
   prev: Types.PEffectRec;
+  nxt: Types.PEffectRec;
   e: Types.PEffectRec;
 begin
   if GDVars.interfaceState <> C_Ifc.CAMPING then
@@ -141,11 +135,12 @@ begin
             GDVars.effFlags[i] := 1;
             e := e^.next;
           end else begin
+            nxt := e^.next;
             FxEngine.RemoveEffect(cur, e^.id, e);
             if prev = cur^.effects then
               e := cur^.effects
             else
-              e := prev^.next;
+              e := nxt;
           end;
           prev := cur^.effects;
           while (prev <> nil) and (prev <> e) and (prev^.next <> e) do

@@ -3,9 +3,6 @@
 unit EffHndlr;
 interface
 
-uses Types, TextRend, ViewChar, FxEngine, CharHlp, ClassCal, Pathing, CbtMap, Debug, GDConsts, GDVars,
-  C_Ifc, C_Status, C_Stat, C_Terr, C_Effect, C_Side, C_Class, C_Item, C_Race;
-
 { Fills the effect handler table with the handler of each effect, and sets the override handler used for items
   (EffGrantItemEffect). }
 procedure InitEffectHandlers;
@@ -13,36 +10,11 @@ procedure InitEffectHandlers;
 { Calls the priming entry of each overlay this unit uses, so the overlay manager loads them. }
 procedure PrimeEffHndlr;
 
-{ Paralyzes the creature's combat target for the given minutes when it fails a saving throw (type 0). Note: the save
-  modifier is never used, so the save has no modifier.
-  @param(creature The attacking creature.)
-  @param(minutes How long the paralysis lasts.)
-  @param(saveMod Unused.) }
-procedure ParalyzeTarget(var creature; minutes: Word; saveMod: ShortInt);
-
-{ Cancels the pending effect and the damage when the given effect is 0 or is the effect being applied.
-  @param(effectId The effect to cancel, or 0 for whichever effect is pending.) }
-procedure NullifyAttack(effectId: Byte);
-
-{ Adds an effect, removed through its handler, unless the effect lock is set.
-  @param(creature The creature given the effect.)
-  @param(effectId The effect.)
-  @param(strength Its strength.)
-  @param(minutes Its duration.)
-  @returns(True when the effect was added.) }
-function AddEffectIfNoLock(var creature; effectId, strength: Byte; minutes: Word): Boolean;
-
 { Helpless effect: ends the creature's actions for the round.
   @param(creature The creature carrying the effect.)
   @param(handlerData Unused.)
   @param(removed Unused.) }
 procedure EffHelpless(var creature; handlerData: Pointer; removed: Boolean);
-
-{ Adds 1 to the saving-throw roll and to the attack roll.
-  @param(creature Unused.)
-  @param(handlerData Unused.)
-  @param(removed Unused.) }
-procedure AddRollBonus(var creature; handlerData: Pointer; removed: Boolean);
 
 { Applies the bless effect: adds 5 to morale and 1 to the attack roll.
   @param(creature Unused.)
@@ -62,9 +34,6 @@ procedure EffCurse(var creature; handlerData: Pointer; removed: Boolean);
   @param(handlerData The effect's node.)
   @param(removed Unused.) }
 procedure EffSticksToSnakes(var creature; handlerData: Pointer; removed: Boolean);
-
-{ Empty routine with no callers. }
-procedure NoopEffHndlrC;
 
 { Effect 7: replaces the attack's damage and THAC0: in melee 1d6 + 2 plus the Strength damage bonus and the weapon's
   plus with the Strength to-hit bonus, at range 1d4 + 1 plus the plus with the Dexterity missile bonus. Note: without a
@@ -189,9 +158,6 @@ procedure EffInvisible(var creature; handlerData: Pointer; removed: Boolean);
   @param(removed Unused.) }
 procedure EffDwarfHitBonus(var creature; handlerData: Pointer; removed: Boolean);
 
-{ Empty routine with no callers. }
-procedure NoopEffHndlrA;
-
 { Applies mirror image: an attack has a chance (strength div 16 images in strength div 16 + 1) to hit an image instead,
   which cancels it and loses an image; the effect ends with the last one. A spell aimed at an area never strikes an
   image.
@@ -264,17 +230,6 @@ procedure EffHasted(var creature; handlerData: Pointer; removed: Boolean);
   @param(handlerData The effect's node.)
   @param(removed Unused.) }
 procedure EffClearStinkingCloud(var creature; handlerData: Pointer; removed: Boolean);
-
-{ Lets a creature avoid a missile: when the current character has a readied weapon and stands more than one cell away, a
-  d100 roll within the chance cancels the damage, makes the attack miss and takes the hit back, with 'Avoids it'.
-  @param(creature The creature attacked.)
-  @param(chance The chance in percent.) }
-procedure AvoidMissile(var creature; chance: Byte);
-
-{ Finds the item a creature attacks with: the missile its readied weapon fires or throws, else the readied weapon.
-  @param(creature The creature.)
-  @returns(The item, or nil with no weapon readied.) }
-function FindDamagingWeapon(creature: Types.PCharRecord): Types.PItemRec;
 
 { Protection from Normal Missiles effect: a missile without a plus is always avoided.
   @param(creature The creature carrying the effect.)
@@ -393,12 +348,6 @@ procedure EffConRegeneration(var creature; handlerData: Pointer; removed: Boolea
   @param(handlerData Unused.)
   @param(removed Unused.) }
 procedure EffMinorGlobe(var creature; handlerData: Pointer; removed: Boolean);
-
-{ Poisons the creature's combat target: unless it makes a saving throw (type 0) with saveMod (and the strength of its
-  poison resistance, effect 116, when saveMod is not negative), it is poisoned and killed.
-  @param(creature The attacking creature.)
-  @param(saveMod Added to the target's saving throw.) }
-procedure PoisonTarget(var creature; saveMod: ShortInt);
 
 { Makes a hit poisonous: the target saves against poison or dies.
   @param(creature The creature the effect is on.)
@@ -551,9 +500,6 @@ procedure EffDisplaced(var creature; handlerData: Pointer; removed: Boolean);
   @param(handlerData Unused.)
   @param(removed Unused.) }
 procedure EffTaunted(var creature; handlerData: Pointer; removed: Boolean);
-
-{ Empty routine with no callers. }
-procedure NoopEffHndlrD;
 
 { Effect 93: halves damage from weapons with defense flags $81.
   @param(creature Unused.)
@@ -716,9 +662,6 @@ procedure EffAttackPenaltyTwo(var creature; handlerData: Pointer; removed: Boole
   @param(removed Unused.) }
 procedure EffAttackPenaltyOne(var creature; handlerData: Pointer; removed: Boolean);
 
-{ Empty routine with no callers. }
-procedure NoopEffHndlrB;
-
 { Does nothing.
   @param(creature Unused.)
   @param(handlerData Unused.)
@@ -734,21 +677,17 @@ procedure EffGrantItemEffect(var creature; handlerData: Pointer; removed: Boolea
 
 implementation
 
-procedure NoopEffHndlrC;
-begin
-end;
-
-procedure NoopEffHndlrA;
-begin
-end;
-
-procedure NoopEffHndlrD;
-begin
-end;
+uses Types, TextRend, ViewChar, FxEngine, CharHlp, ClassCal, Pathing, CbtMap, Debug, GDConsts, GDVars,
+  C_Ifc, C_Status, C_Stat, C_Terr, C_Effect, C_Side, C_Class, C_Item, C_Race;
 
 type
   TNN16 = 0..32767;
 
+{ Paralyzes the creature's combat target for the given minutes when it fails a saving throw (type 0). Note: the save
+  modifier is never used, so the save has no modifier.
+  @param(creature The attacking creature.)
+  @param(minutes How long the paralysis lasts.)
+  @param(saveMod Unused.) }
 procedure ParalyzeTarget(var creature; minutes: Word; saveMod: ShortInt);
 begin
   GDVars.effectScratch.other := Types.PCharRecord(creature)^.combatAddr^.target;
@@ -766,6 +705,8 @@ begin
   FxEngine.PrimeFxEngine;
 end;
 
+{ Cancels the pending effect and the damage when the given effect is 0 or is the effect being applied.
+  @param(effectId The effect to cancel, or 0 for whichever effect is pending.) }
 procedure NullifyAttack(effectId: Byte);
 begin
   if (effectId = 0) or (GDVars.currentEffectId = effectId) then begin
@@ -774,6 +715,12 @@ begin
   end
 end;
 
+{ Adds an effect, removed through its handler, unless the effect lock is set.
+  @param(creature The creature given the effect.)
+  @param(effectId The effect.)
+  @param(strength Its strength.)
+  @param(minutes Its duration.)
+  @returns(True when the effect was added.) }
 function AddEffectIfNoLock(var creature; effectId, strength: Byte; minutes: Word): Boolean;
 begin
   if GDVars.effectBusy <> 0 then
@@ -792,6 +739,10 @@ begin
   done := CharHlp.EndActions(Pointer(creature))
 end;
 
+{ Adds 1 to the saving-throw roll and to the attack roll.
+  @param(creature Unused.)
+  @param(handlerData Unused.)
+  @param(removed Unused.) }
 procedure AddRollBonus(var creature; handlerData: Pointer; removed: Boolean);
 begin
   Inc(GDVars.saveRoll);
@@ -819,7 +770,8 @@ var
   { Unused in this version; see the other implementations of this routine. }
   done: Boolean;
 begin
-  penalty := Types.PCharRecord(Pointer(creature))^.curAtt[1] + Types.PCharRecord(Pointer(creature))^.curAtt[2];
+  penalty := Types.PCharRecord(Pointer(creature))^.curAtt[1] +
+    Types.PCharRecord(Pointer(creature))^.curAtt[2];
   if Types.PEffectRec(handlerData)^.strength > penalty then
     Dec(Types.PEffectRec(handlerData)^.strength, penalty)
   else
@@ -875,7 +827,7 @@ end;
 procedure EffResistCold(var creature; handlerData: Pointer; removed: Boolean);
 begin
   if (GDVars.elementMask and $02) <> 0 then begin
-    GDVars.currentDamage := GDVars.currentDamage div 2;
+    GDVars.currentDamage := GDVars.currentDamage shr 1;
     Inc(GDVars.saveRoll, 3)
   end
 end;
@@ -956,7 +908,7 @@ end;
 procedure EffResistFire(var creature; handlerData: Pointer; removed: Boolean);
 begin
   if (not removed) and ((GDVars.elementMask and $01) <> 0) then begin
-    GDVars.currentDamage := GDVars.currentDamage div 2;
+    GDVars.currentDamage := GDVars.currentDamage shr 1;
     Inc(GDVars.saveRoll, 3)
   end
 end;
@@ -1063,7 +1015,7 @@ end;
 
 procedure EffEnfeeble(var creature; handlerData: Pointer; removed: Boolean);
 begin
-  GDVars.currentDamage := GDVars.currentDamage - (GDVars.currentDamage div 4)
+  GDVars.currentDamage := GDVars.currentDamage - ((GDVars.currentDamage shr 1) shr 1)
 end;
 
 procedure EffCoughing(var creature; handlerData: Pointer; removed: Boolean);
@@ -1140,8 +1092,8 @@ begin
       end;
     61..80:
       begin
-        FxEngine.AddEffectWithMessage(Pointer(creature), 77, 1, Types.PCharRecord(Pointer(creature))^.hostile, 1, 1, 0,
-                                      'goes berserk');
+        FxEngine.AddEffectWithMessage(Pointer(creature), 77, 1,
+                                      Types.PCharRecord(Pointer(creature))^.hostile, 1, 1, 0, 'goes berserk');
         FxEngine.CallEffectHandler(77, creature, nil, False)
       end;
     81..100:
@@ -1179,9 +1131,9 @@ begin
   GDVars.moveAttackMultiplier := GDVars.moveAttackMultiplier * 2
 end;
 
-procedure NoopEffHndlrB;
-begin
-end;
+procedure AvoidMissile(var creature; chance: Byte); forward;
+
+function FindDamagingWeapon(creature: Types.PCharRecord): Types.PItemRec; forward;
 
 procedure EffClearStinkingCloud(var creature; handlerData: Pointer; removed: Boolean);
 var
@@ -1247,9 +1199,14 @@ begin
   end
 end;
 
+{ Lets a creature avoid a missile: when the current character has a readied weapon and stands more than one cell away, a
+  d100 roll within the chance cancels the damage, makes the attack miss and takes the hit back, with 'Avoids it'.
+  @param(creature The creature attacked.)
+  @param(chance The chance in percent.) }
 procedure AvoidMissile(var creature; chance: Byte);
 begin
-  if (GDVars.curChar^.equipped[0] <> nil) and (CharHlp.CalcDistance(GDVars.curChar, Pointer(creature)) > 1) and
+  if (GDVars.curChar^.equipped[0] <> nil) and
+      (CharHlp.CalcDistance(GDVars.curChar, Pointer(creature)) > 1) and
       (FxEngine.RollDice(1, 100) <= chance) then begin
     CharHlp.PrintCreatureMessage(Pointer(creature), 'Avoids it', 10, True);
     GDVars.currentDamage := 0;
@@ -1258,6 +1215,9 @@ begin
   end
 end;
 
+{ Finds the item a creature attacks with: the missile its readied weapon fires or throws, else the readied weapon.
+  @param(creature The creature.)
+  @returns(The item, or nil with no weapon readied.) }
 function FindDamagingWeapon(creature: Types.PCharRecord): Types.PItemRec;
 var
   item: Types.PItemRec;
@@ -1279,7 +1239,7 @@ end;
 
 procedure EffSlow(var creature; handlerData: Pointer; removed: Boolean);
 begin
-  GDVars.moveAttackMultiplier := GDVars.moveAttackMultiplier div 2;
+  GDVars.moveAttackMultiplier := GDVars.moveAttackMultiplier shr 1;
 end;
 
 procedure EffDiseaseStrength(var creature; handlerData: Pointer; removed: Boolean);
@@ -1445,6 +1405,10 @@ begin
     EffHndlr.NullifyAttack(0)
 end;
 
+{ Poisons the creature's combat target: unless it makes a saving throw (type 0) with saveMod (and the strength of its
+  poison resistance, effect 116, when saveMod is not negative), it is poisoned and killed.
+  @param(creature The attacking creature.)
+  @param(saveMod Added to the target's saving throw.) }
 procedure PoisonTarget(var creature; saveMod: ShortInt);
 var
   effectNode: Pointer;
@@ -1490,7 +1454,7 @@ begin
     if GDVars.scratchIndex <= GDVars.targetCount then
       if GDVars.creatureArr[GDVars.targetList[GDVars.scratchIndex].creatureIndex] <> nil then
         if Byte(GDVars.creatureArr[GDVars.targetList[GDVars.scratchIndex].creatureIndex]^.hostile) <>
-            Byte(Types.PCharRecord(Pointer(creature))^.hostile) then begin
+           Byte(Types.PCharRecord(Pointer(creature))^.hostile) then begin
           target := GDVars.creatureArr[GDVars.targetList[GDVars.scratchIndex].creatureIndex];
           GDVars.scratchFlag := 1
         end;
@@ -1564,7 +1528,8 @@ var
   terrain: Byte;
   neighborDirections: array[1..5] of Byte;
 begin
-  if (Types.PCharRecord(Pointer(creature))^.hpCur <= 0) or (Types.PCharRecord(Pointer(creature))^.inPlay = 0) then begin
+  if (Types.PCharRecord(Pointer(creature))^.hpCur <= 0) or
+      (Types.PCharRecord(Pointer(creature))^.inPlay = 0) then begin
     ownedPoolCount := 0;
     node := GDVars.acidPoolHead;
     if GDVars.acidPoolHead = nil then begin
@@ -1693,7 +1658,8 @@ var
   occupant: Byte;
   slot: Byte;
 begin
-  if Types.PCharRecord(Pointer(creature))^.hpCur < (Types.PCharRecord(Pointer(creature))^.hpMax div 2) then begin
+  if Types.PCharRecord(Pointer(creature))^.hpCur <
+      (Types.PCharRecord(Pointer(creature))^.hpMax div 2) then begin
     walk := GDVars.partyHead;
     target := GDVars.partyHead;
     done := False;
@@ -1752,7 +1718,8 @@ procedure EffBerserk(var creature; handlerData: Pointer; removed: Boolean);
 begin
   if not removed then begin
     Types.PCharRecord(Pointer(creature))^.quickFight := 1;
-    if (Types.PCharRecord(Pointer(creature))^.npc <= $7F) or (Types.PCharRecord(Pointer(creature))^.npc = $B3) then
+    if (Types.PCharRecord(Pointer(creature))^.npc <= $7F) or
+        (Types.PCharRecord(Pointer(creature))^.npc = $B3) then
       Types.PCharRecord(Pointer(creature))^.npc := $B3
     else
       Types.PCharRecord(Pointer(creature))^.npc := $B2;
@@ -1912,7 +1879,8 @@ end;
 
 procedure EffGhoulPara(var creature; handlerData: Pointer; removed: Boolean);
 begin
-  if Types.PCharRecord(Types.PCharRecord(Pointer(creature))^.combatAddr^.target)^.race > C_Race.QUALINESTI_ELF then
+  if Types.PCharRecord(Types.PCharRecord(Pointer(creature))^.combatAddr^.target)^.race >
+      C_Race.QUALINESTI_ELF then
     EffHndlr.ParalyzeTarget(creature, 100, 0)
 end;
 
@@ -1933,7 +1901,7 @@ var item: Types.PItemRec;
 begin
   item := EffHndlr.FindDamagingWeapon(GDVars.curChar);
   if (item <> nil) and ((GDVars.baseItems[item^.itemType].defenseFlags and $81) <> 0) then
-    GDVars.currentDamage := GDVars.currentDamage div 2
+    GDVars.currentDamage := GDVars.currentDamage shr 1
 end;
 
 procedure EffConSpellSave(var creature; handlerData: Pointer; removed: Boolean);
@@ -1989,7 +1957,7 @@ begin
   if item <> nil then
     if (GDVars.baseItems[item^.itemType].defenseFlags = 0) or
         ((GDVars.baseItems[item^.itemType].defenseFlags and $01) <> 0) then
-      GDVars.currentDamage := GDVars.currentDamage div 2
+      GDVars.currentDamage := GDVars.currentDamage shr 1
 end;
 
 procedure EffHolyWater(var creature; handlerData: Pointer; removed: Boolean);
@@ -2030,7 +1998,8 @@ procedure EffConfusedBerserk(var creature; handlerData: Pointer; removed: Boolea
 begin
   if not removed then begin
     Types.PCharRecord(Pointer(creature))^.quickFight := 1;
-    if (Types.PCharRecord(Pointer(creature))^.npc <= $7F) or (Types.PCharRecord(Pointer(creature))^.npc = $B3) then
+    if (Types.PCharRecord(Pointer(creature))^.npc <= $7F) or
+        (Types.PCharRecord(Pointer(creature))^.npc = $B3) then
       Types.PCharRecord(Pointer(creature))^.npc := $B3
     else
       Types.PCharRecord(Pointer(creature))^.npc := $B2;
@@ -2038,7 +2007,8 @@ begin
     Pathing.BuildTargetList(CbtMap.CombatCellX(Types.PCharRecord(Pointer(creature))),
                             CbtMap.CombatCellY(Types.PCharRecord(Pointer(creature))), 255, 255,
                             CbtMap.GetIconSize(Types.PCharRecord(Pointer(creature))), GDVars.arena);
-    Types.PCharRecord(Pointer(creature))^.combatAddr^.target := GDVars.creatureArr[GDVars.targetList[2].creatureIndex];
+    Types.PCharRecord(Pointer(creature))^.combatAddr^.target :=
+      GDVars.creatureArr[GDVars.targetList[2].creatureIndex];
     Byte(Types.PCharRecord(Pointer(creature))^.hostile) :=
       Types.PCharRecord(Types.PCharRecord(Pointer(creature))^.combatAddr^.target)^.hostile xor 1
   end else begin

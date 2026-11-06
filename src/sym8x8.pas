@@ -5,9 +5,6 @@ unit Sym8x8;
 
 interface
 
-{ Empty routine with no callers. }
-procedure NoopSym8x8;
-
 { Loads an 8x8 symbol set from picture fileId of 8X8D<disk>.DAX into symbolSetPtrs[setId], with light magenta
   transparent, then drains pending keystrokes. A set number outside 0..4 does nothing. If the picture cannot be loaded,
   the error is shown in text mode and the game exits after a key. Note: RestoreVideoMode runs twice on that path.
@@ -32,10 +29,6 @@ procedure PrimeSym8x8;
 implementation
 
 uses Types, Blit, GameIo, Crt, GDConsts, GDVars;
-
-procedure NoopSym8x8;
-begin
-end;
 
 procedure PrimeSym8x8;
 begin

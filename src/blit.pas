@@ -214,9 +214,9 @@ end;
 function SrcNibble(color: Byte; map: Types.TColorMap): Byte;
 begin
   if Odd(color) then
-    SrcNibble := map[color div 2] and $0F
+    SrcNibble := map[color shr 1] and $0F
   else
-    SrcNibble := (map[color div 2] and $F0) shr 4;
+    SrcNibble := (map[color shr 1] and $F0) shr 4;
 end;
 
 procedure SetVideoMode(mode: Byte);
@@ -319,20 +319,20 @@ begin
               for k := 0 to 3 do
                 if Odd(k) then
                   data[dstOff] := data[dstOff] or
-                    GDConsts.cgaPixPos[Blit.SrcNibble(chunk[k div 2] and $0F, map)][k]
+                    GDConsts.cgaPixPos[Blit.SrcNibble(chunk[k shr 1] and $0F, map)][k]
                 else
                   data[dstOff] := data[dstOff] or
-                    GDConsts.cgaPixPos[Blit.SrcNibble((chunk[k div 2] and $F0) shr 4, map)][k];
+                    GDConsts.cgaPixPos[Blit.SrcNibble((chunk[k shr 1] and $F0) shr 4, map)][k];
               if transp <> nil then
                 data[dstOff] := data[dstOff] and not transp^[maskOff - 2];
               Inc(dstOff);
               for k := 4 to 7 do
                 if Odd(k) then
                   data[dstOff] := data[dstOff] or
-                    GDConsts.cgaPixPos[Blit.SrcNibble(chunk[k div 2] and $0F, map)][k - 4]
+                    GDConsts.cgaPixPos[Blit.SrcNibble(chunk[k shr 1] and $0F, map)][k - 4]
                 else
                   data[dstOff] := data[dstOff] or
-                    GDConsts.cgaPixPos[Blit.SrcNibble((chunk[k div 2] and $F0) shr 4, map)][k - 4];
+                    GDConsts.cgaPixPos[Blit.SrcNibble((chunk[k shr 1] and $F0) shr 4, map)][k - 4];
               if transp <> nil then
                 data[dstOff] := data[dstOff] and not transp^[maskOff - 1];
               Inc(dstOff);
@@ -349,9 +349,9 @@ begin
               bit := $80;
               for k := 0 to 7 do begin
                 if Odd(k) then
-                  color := chunk[k div 2] and $0F
+                  color := chunk[k shr 1] and $0F
                 else
-                  color := chunk[k div 2] shr 4;
+                  color := chunk[k shr 1] shr 4;
                 for plane := 0 to 3 do
                   if (GDConsts.egaPlaneBit[plane] and color) > 0 then
                     data[plane + dstOff] := data[plane + dstOff] or bit;

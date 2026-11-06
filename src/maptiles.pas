@@ -6,9 +6,6 @@ interface
 
 uses Types, Blit, GameIo, Crt, GDConsts, GDVars, Debug, C_Dir;
 
-{ Empty routine with no callers. }
-procedure NoopMapTiles;
-
 { Loads a picture of 24x24 map tiles and copies the given number of its tiles into tile-set buffer 1 from the given slot
   on, then drains pending keystrokes. A slot above 39 is a fatal error, reported in text mode.
   @param(resourceName Base name of the DAX file.)
@@ -51,10 +48,6 @@ procedure DrawIconAnimSprite(col, row: ShortInt; facing, frame, animIdx: Byte);
 procedure PrimeMapTiles;
 
 implementation
-
-procedure NoopMapTiles;
-begin
-end;
 
 const
   { ids 128+ live in tile-set buffer 2 }

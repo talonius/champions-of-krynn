@@ -127,20 +127,6 @@ procedure RemoveAiEffects(cr: Pointer);
   @returns(True when the creature had the effect.) }
 function RemoveEffectWithMessage(cr: Pointer; effId: Byte): Boolean;
 
-{ Encodes a Strength as an effect strength: 18 with exceptional Strength becomes the exceptional value + 1 (1..101), any
-  other base Strength becomes the base + 100.
-  @param(baseStr Base Strength.)
-  @param(excStr Exceptional Strength, read when the base Strength is 18.)
-  @returns(The encoded Strength.) }
-function StrengthModifier(baseStr, excStr: Byte): Byte;
-
-{ Decodes an effect's strength byte, bit 7 aside, into Strength: up to 101 is Strength 18 with exceptional Strength of
-  the value less 1, above it Strength of the value less 100 with no exceptional Strength.
-  @param(eff The Strength effect.)
-  @param(baseStr Receives Strength.)
-  @param(excStr Receives exceptional Strength.) }
-procedure StrengthEffectToStrength(eff: Types.PEffectRec; var baseStr, excStr: Byte);
-
 { Tells whether a Strength beats a creature's permanent one: a higher base Strength, or 18 with an exceptional Strength
   above its permanent exceptional Strength.
   @param(cr Creature compared against.)
@@ -227,11 +213,12 @@ const
   LIGHT_LEVEL = 500;
 
 type
-  TDirs = array[0..4] of Byte;
+  TDirs = array[0..255] of Byte;
+  PDirs = ^TDirs;
 
 var
   { the cloud cell directions, read through FindCreatureAtCell's table parameter }
-  terrainDirs: TDirs absolute GDConsts.cloudDirs;
+  terrainDirs: array[0..4] of Byte absolute GDConsts.cloudDirs;
 
 procedure PrimeFxEngine;
 begin
@@ -494,7 +481,7 @@ end;
   @param(tbl Directions from a cloud's corner to its cells, read from index 1.)
   @returns(The caster of the first cloud, from the given node on, that has one of its checked cells live at the cell;
     the head of the creature list when there is none.) }
-function FindCreatureAtCell(x, y: ShortInt; start: Types.PCloudNode; count: Byte; var tbl: TDirs): Types.PCharRecord;
+function FindCreatureAtCell(x, y: ShortInt; start: Types.PCloudNode; count: Byte; tbl: PDirs): Types.PCharRecord;
 var
   p: Types.PCloudNode;
   found: Boolean;
@@ -505,7 +492,7 @@ begin
   while (p <> nil) and (not found) do begin
     for i := 1 to count do
       if p^.activeCells[i] <> 0 then
-        if (p^.x + GDConsts.dirDeltaX[tbl[i]] = x) and (p^.y + GDConsts.dirDeltaY[tbl[i]] = y) then
+        if (p^.x + GDConsts.dirDeltaX[tbl^[i]] = x) and (p^.y + GDConsts.dirDeltaY[tbl^[i]] = y) then
           found := True;
     if not found then
       p := p^.next;
@@ -536,7 +523,7 @@ begin
         savedChar := GDVars.curChar;
         GDVars.curChar := FxEngine.FindCreatureAtCell(CbtMap.CombatCellX(Types.PCharRecord(cr)),
                                                CbtMap.CombatCellY(Types.PCharRecord(cr)), GDVars.cloudHead, 4,
-                                               terrainDirs);
+                                               @terrainDirs);
         FxEngine.AddEffectWithMessage(cr, 30, FxEngine.RollDice(1, 4) + 1, 255, 0, 0, Ord(saved), 'starts to cough');
         eff2 := nil;
         if CharHlp.HasEffect(cr, 30, eff2) then
@@ -546,7 +533,7 @@ begin
         savedChar := GDVars.curChar;
         GDVars.curChar := FxEngine.FindCreatureAtCell(CbtMap.CombatCellX(Types.PCharRecord(cr)),
                                                CbtMap.CombatCellY(Types.PCharRecord(cr)), GDVars.cloudHead, 4,
-                                               terrainDirs);
+                                               @terrainDirs);
         FxEngine.AddEffectWithMessage(cr, 31, FxEngine.RollDice(1, 4) + 1, 255, 0, 0, Ord(saved),
                                       'chokes and gags from nausea');
         if CharHlp.HasEffect(cr, 31, eff) then
@@ -728,6 +715,11 @@ begin
   end;
 end;
 
+{ Encodes a Strength as an effect strength: 18 with exceptional Strength becomes the exceptional value + 1 (1..101), any
+  other base Strength becomes the base + 100.
+  @param(baseStr Base Strength.)
+  @param(excStr Exceptional Strength, read when the base Strength is 18.)
+  @returns(The encoded Strength.) }
 function StrengthModifier(baseStr, excStr: Byte): Byte;
 begin
   StrengthModifier := baseStr + 100;
@@ -735,6 +727,11 @@ begin
     StrengthModifier := excStr + 1;
 end;
 
+{ Decodes an effect's strength byte, bit 7 aside, into Strength: up to 101 is Strength 18 with exceptional Strength of
+  the value less 1, above it Strength of the value less 100 with no exceptional Strength.
+  @param(eff The Strength effect.)
+  @param(baseStr Receives Strength.)
+  @param(excStr Receives exceptional Strength.) }
 procedure StrengthEffectToStrength(eff: Types.PEffectRec; var baseStr, excStr: Byte);
 begin
   excStr := 0;

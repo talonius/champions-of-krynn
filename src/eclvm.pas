@@ -22,7 +22,13 @@ uses Types, CopyProt, Temple, PostCbt, Shop, EclMenu, Combat, CombatAi, CombatSt
   View3D, Pathing, CbtMap, MapTiles, Debug, DaxIo, GameIo, Mouse, SoundDrv, TextRend, GDConsts, GDVars, Crt, C_Class,
   C_Ifc, C_Side;
 
+procedure EnterCamp; forward;
+
 procedure CallEclScript(address: Word); forward;
+
+procedure NewEclDone; forward;
+
+procedure DispatchEclCommand; forward;
 
 procedure PrimeEclVm;
 begin

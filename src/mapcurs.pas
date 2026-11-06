@@ -5,12 +5,6 @@
 unit MapCurs;
 interface
 
-{ Empty routine with no callers. }
-procedure NoopMapCursA;
-
-{ Empty routine with no callers. }
-procedure NoopMapCursB;
-
 { Draws the party cursor on the overland map: saves the map cell under the party (one cell in from the map's corner)
   into a buffer, lays the cursor image over a copy of it through its mask, shows the result and clears the dirty spans
   the drawing recorded. }
@@ -22,24 +16,9 @@ procedure RestoreCursorBackground;
 { Does nothing; calling it loads this overlay. }
 procedure PrimeMapCurs;
 
-{ Empty routine with no callers. }
-procedure NoopMapCursC;
-
 implementation
 
 uses Blit, GDConsts, GDVars;
-
-procedure NoopMapCursA;
-begin
-end;
-
-procedure NoopMapCursB;
-begin
-end;
-
-procedure NoopMapCursC;
-begin
-end;
 
 procedure PrimeMapCurs;
 begin

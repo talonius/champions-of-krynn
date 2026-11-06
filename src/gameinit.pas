@@ -49,6 +49,8 @@ var
   { Unused in this version; see the other implementations of this routine. }
   inputLine: string;
 begin
+  GDVars.startupFlagA := 0;
+  GDVars.startupFlagB := 0;
   { force Num Lock on }
   biosKbdFlags := biosKbdFlags or $20;
   Randomize;
