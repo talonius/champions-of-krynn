@@ -203,11 +203,9 @@ begin
   transpHigh := transpColor shl 4;
   bit := $80;
   for i := 0 to 3 do begin
-    if (chunk[i] and $F0) = transpHigh then
-      Inc(mask, bit);
+    if (chunk[i] and $F0) = transpHigh then Inc(mask, bit);
     bit := bit shr 1;
-    if (chunk[i] and $0F) = transpColor then
-      Inc(mask, bit);
+    if (chunk[i] and $0F) = transpColor then Inc(mask, bit);
     bit := bit shr 1;
   end;
   ComputeMask := mask;

@@ -42,7 +42,7 @@ procedure TriggerEffectsWithCondition(id: Byte; var cr);
 
 { Applies the clouds and pools on the cells of a creature in play. In a stinking cloud, when b is nonzero and the
   creature is not undead, helpless or protected by effect 99, it rolls a saving throw (type 0): on a save it starts to
-  cough for 1 minute, otherwise nausea leaves it helpless for 1d4 + 1. The cloud's caster stands in as the current
+  cough for 1d4 + 1, otherwise nausea leaves it helpless for 1d4 + 1. The cloud's caster stands in as the current
   character while the effect is added and its handler runs. An acid pool deals 1d6 damage. Note: the cough handler is
   passed the node left by the last failed effect search, which is nil, rather than the cough effect just added.
   @param(cr Creature to check.)
@@ -57,16 +57,15 @@ procedure ConsiderTerrainEffects(cr: Pointer; b: Byte);
     class.) }
 function AttackRollNoAttacker(defender: Pointer; sixtyMinusThac0: Byte): Boolean;
 
-{ Rolls attacker's attack on defender. Makes attacker visible, rolls a d20 into GDVars.gAttackRoll (1 always misses, 20
-  counts as 100), runs attacker's condition-10 and defender's condition-16 effects, and adds the side's to-hit modifier
-  from zone 1: modPartyThac0 for an attacker on the party's side, modMonThac0 otherwise. The values go to the debug
-  trace. Note: the light-level adjustment selects on the constant LIGHT_LEVEL, which matches none of its cases, so it
-  never applies.
+{ Rolls an attack by one creature on another. Makes the attacker visible, rolls a d20 (1 always misses, 20 counts as
+  100), runs the attacker's condition-10 and the defender's condition-16 effects, and adds the to-hit modifier zone 1
+  holds for the attacker's side. Note: the party's light-level adjustment selects on a constant that matches none of its
+  cases, so it never applies.
   @param(attacker Creature attacking.)
   @param(defender Creature attacked.)
-  @param(sixtyMinusAc Value the attack must reach, 60 minus defender's armor class.)
-  @returns(True when the adjusted roll is not negative and the roll plus attacker's thac0Adj and the modifier reaches
-    sixtyMinusAc.) }
+  @param(sixtyMinusAc Value the attack must reach, 60 minus the defender's armor class.)
+  @returns(True when the adjusted roll is not negative and the roll plus the attacker's THAC0 adjustment and the
+    modifier reaches the value needed.) }
 function AttackRoll(attacker, defender: Pointer; sixtyMinusAc: Byte): Boolean;
 
 { Rolls cr's saving throw. A natural 1 fails and a natural 20 succeeds; otherwise the d20 plus cr's saveBonus and b,
@@ -538,7 +537,7 @@ begin
         GDVars.curChar := FxEngine.FindCreatureAtCell(CbtMap.CombatCellX(Types.PCharRecord(cr)),
                                                CbtMap.CombatCellY(Types.PCharRecord(cr)), GDVars.cloudHead, 4,
                                                terrainDirs);
-        FxEngine.AddEffectWithMessage(cr, 30, 1, 255, 0, 0, Ord(saved), 'starts to cough');
+        FxEngine.AddEffectWithMessage(cr, 30, FxEngine.RollDice(1, 4) + 1, 255, 0, 0, Ord(saved), 'starts to cough');
         eff2 := nil;
         if CharHlp.HasEffect(cr, 30, eff2) then
           FxEngine.CallEffectHandler(30, cr, eff, False);
@@ -584,17 +583,16 @@ begin
     if GDVars.gAttackRoll = 20 then GDVars.gAttackRoll := 100;
     FxEngine.TriggerEffectsWithCondition(10, attacker);
     FxEngine.TriggerEffectsWithCondition(16, defender);
-    if Types.PCharRecord(attacker)^.hostile = C_Side.PLAYER then
-      lightAdj := GDVars.zone1^.modPartyThac0
-    else
+    if Types.PCharRecord(attacker)^.hostile = C_Side.PLAYER then begin
+      lightAdj := GDVars.zone1^.modPartyThac0;
+      case FxEngine.LIGHT_LEVEL of
+        1: Inc(lightAdj, 2);
+        2: Inc(lightAdj);
+        4: Dec(lightAdj);
+        5: Dec(lightAdj, 2);
+      end;
+    end else
       lightAdj := GDVars.zone1^.modMonThac0;
-    case FxEngine.LIGHT_LEVEL of
-      1: Inc(lightAdj, 2);
-      2: Inc(lightAdj);
-      4: Dec(lightAdj);
-      5: Dec(lightAdj, 2);
-    end;
-    Debug.PrintDebug('thac0', Types.PCharRecord(attacker)^.thac0Adj, sixtyMinusAc, lightAdj);
     if GDVars.gAttackRoll >= 0 then
       if GDVars.gAttackRoll + Types.PCharRecord(attacker)^.thac0Adj + lightAdj >= sixtyMinusAc then
         AttackRoll := True;

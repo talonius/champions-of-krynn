@@ -192,9 +192,9 @@ procedure EffDwarfHitBonus(var creature; handlerData: Pointer; removed: Boolean)
 { Empty routine with no callers. }
 procedure NoopEffHndlrA;
 
-{ Effect 28 (Mirror Image): a single-target spell has a chance (strength div 16 images in strength div 16 + 1) to strike
-  an image instead, which cancels it and loses an image; the effect ends with the last one. Note: a weapon attack never
-  strikes an image.
+{ Applies mirror image: an attack has a chance (strength div 16 images in strength div 16 + 1) to hit an image instead,
+  which cancels it and loses an image; the effect ends with the last one. A spell aimed at an area never strikes an
+  image.
   @param(creature The creature carrying the effect.)
   @param(handlerData The effect's node.)
   @param(removed Unused.) }
@@ -835,6 +835,7 @@ var
   relation: Byte;
   itemPlus: Byte;
 begin
+  Debug.PrintDebug('bad news', 0, 0, 0);
   if Types.PCharRecord(Pointer(creature))^.equipped[0] <> nil then
     itemPlus := Types.PCharRecord(Pointer(creature))^.equipped[0]^.plus;
   target := Types.PCharRecord(Pointer(creature))^.combatAddr^.target;
@@ -1050,9 +1051,8 @@ end;
 
 procedure EffMirrorImage(var creature; handlerData: Pointer; removed: Boolean);
 begin
-  { Note: an image is consumed only against a single-target spell, so a weapon attack never strips one. }
   if (FxEngine.RollDice(1, (Types.PEffectRec(handlerData)^.strength div 16) + 1) > 1) and
-      (GDVars.currentSpell > 0) and (GDVars.multiTarget = 0) then begin
+      ((GDVars.currentSpell <= 0) or (GDVars.multiTarget = 0)) then begin
     EffHndlr.NullifyAttack(0);
     CharHlp.PrintCreatureMessage(Pointer(creature), 'lost an image', 10, True);
     Dec(Types.PEffectRec(handlerData)^.strength);

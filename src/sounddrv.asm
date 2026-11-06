@@ -78,15 +78,15 @@ DriverData      dw      0000h
 ; The run-time error the countdown puts up.
 crashMsg        db      'Run-time Error 209 at 0BAD:1138',0Ah,0Dh
 ; The sound last loaded; zero is silence.
-soundId         dw      5050h
+soundId         dw      6552h
 ; The voice whose script is running.
-curVoice        dw      5050h
+curVoice        dw      7564h
 ; The bank being run.
-voiceBase       dw      0850h
+voiceBase       dw      6563h
 ; The bank's divisor table.
-freqTable       dw      0302h
+freqTable       dw      0000h
 ; Where opReturn resumes the script after an opCall.
-returnPtr       dw      0804h
+returnPtr       dw      0000h
 ; The sound each voice of the bank is playing; zero once its script has ended.
 voiceSounds     db      00h,00h,00h,00h
 ; Clear to keep both banks quiet while their scripts still run.
@@ -98,13 +98,13 @@ noteLengths     db      00h,00h,00h,02h,00h,03h,04h,00h,06h,08h,00h,0Ch,10h,00h,
 opTable         dw      offset opClearVoice,offset opReturn,offset opCall
                 dw      offset opSelectVoice,offset opLoop,offset opSetField
 ; Bank A, the PC-speaker voices.
-voicesA         db      00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,05h,43h
-                db      75h,72h,73h,65h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h
+voicesA         db      64h,73h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h
                 db      00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h
-                db      00h,00h,00h,00h,00h,00h,00h,11h,43h,75h,72h,65h,20h,4Ch,69h,67h
-                db      68h,74h,20h,57h,6Fh,75h,6Eh,64h,73h,00h,00h,00h,00h,00h,00h,00h
-                db      00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h
-                db      12h,43h,61h,75h,73h,65h,20h,00h,30h,4Ch,00h,00h,00h,07h,00h,00h
+                db      00h,00h,00h,0Dh,4Dh,61h,67h,69h,63h,20h,4Dh,69h,73h,73h,69h,6Ch
+                db      65h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h
+                db      00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,14h,50h,72h,6Fh
+                db      74h,65h,63h,74h,69h,6Fh,6Eh,20h,46h,72h,6Fh,6Dh,20h,45h,76h,69h
+                db      6Ch,00h,00h,00h,00h,00h,00h,00h,30h,4Ch,00h,00h,00h,07h,00h,00h
                 db      30h,48h,00h,00h,00h,0Fh,00h,00h,30h,50h,00h,00h,00h,14h,00h,06h
                 db      90h,20h,00h,04h,00h,25h,00h,10h,50h,08h,00h,00h,00h,32h,00h,19h
                 db      30h,60h,00h,00h,00h,37h,00h,06h,90h,20h,00h,00h,00h,4Ah,00h,10h
@@ -120,38 +120,38 @@ voicesA         db      00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,
                 db      00h,10h,00h,00h,00h,19h,00h,10h,00h,18h,00h,00h,00h,20h,00h,10h
                 db      00h,1Ch,00h,00h,00h,27h,00h,10h,10h,28h,00h,00h,00h,04h,00h,10h
                 db      20h,28h,00h,00h,00h,07h,00h,10h,90h,00h,00h,00h,00h,0Ah,00h,10h
-                db      90h,00h,00h,02h,00h,0Eh,00h,10h,90h,00h,00h,00h,00h,12h,00h,00h
-                db      00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,0Ch
+                db      90h,00h,00h,02h,00h,0Eh,00h,10h,90h,00h,00h,00h,00h,12h,00h,64h
+                db      20h,50h,65h,72h,73h,6Fh,6Eh,00h,00h,00h,00h,00h,00h,00h,00h,00h
 ; Bank A's PIT divisors for the twelve semitones of the lowest octave.
 freqTableA      db      84h,8Eh,84h,86h,0F7h,7Eh,0D7h,77h,4Fh,71h,0C4h,6Ah,0C6h,64h,1Eh,5Fh
                 db      0C7h,59h,0BDh,54h,0FCh,4Fh,7Eh,4Bh
 ; The bank A voice that has the speaker this tick.
 speakerVoice    dw      0000h
 ; Bank B, the Tandy voices: three tone channels and the noise channel.
-voicesB         db      00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,07h,45h
-                db      6Eh,6Ch,61h,72h,67h,65h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h
+voicesB         db      74h,20h,46h,69h,72h,65h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h
                 db      00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h
-                db      00h,00h,00h,00h,00h,00h,00h,06h,52h,65h,64h,75h,63h,65h,00h,00h
+                db      00h,00h,00h,13h,53h,69h,6Ch,65h,6Eh,63h,65h,2Ch,20h,31h,35h,27h
+                db      20h,52h,61h,64h,69h,75h,73h,00h,00h,00h,00h,00h,00h,00h,00h,00h
+                db      00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,0Bh,53h,6Ch,6Fh
+                db      77h,20h,50h,6Fh,69h,73h,6Fh,6Eh,00h,00h,00h,00h,00h,00h,00h,00h
                 db      00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h
+                db      00h,00h,00h,00h,00h,0Bh,53h,6Eh,61h,6Bh,65h,20h,43h,68h,61h,72h
+                db      6Dh,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h
+                db      00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,10h,53h
+                db      70h,69h,72h,69h,74h,75h,61h,6Ch,20h,48h,61h,6Dh,6Dh,65h,72h,00h
                 db      00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h
-                db      07h,46h,72h,69h,65h,6Eh,64h,73h,00h,00h,00h,00h,00h,00h,00h,00h
-                db      00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h
-                db      00h,00h,00h,00h,00h,00h,00h,00h,00h,0Dh,4Dh,61h,67h,69h,63h,20h
-                db      4Dh,69h,73h,73h,69h,6Ch,65h,00h,00h,00h,00h,00h,00h,00h,00h,00h
-                db      00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h
-                db      00h,00h,14h,50h,72h,6Fh,74h,65h,63h,74h,69h,6Fh,6Eh,20h,46h,72h
-                db      6Fh,6Dh,20h,45h,76h,69h,6Ch,00h,00h,00h,00h,00h,00h,00h,00h,04h
+                db      00h,00h,00h,00h,00h,00h,00h,13h,44h,65h,74h,65h,63h,74h,20h,04h
                 db      0B8h,0Eh,10h,10h,28h,00h,00h,00h,04h,0BAh,0Eh,10h,20h,28h,00h,00h
                 db      00h,02h,00h,02h,00h,04h,0A3h,0Eh,10h,90h,00h,00h,00h,00h,06h,89h
-                db      16h,0Eh,10h,90h,00h,00h,02h,00h,02h,06h,0C4h,3Eh,0Eh,10h,90h,00h
-                db      00h,00h,00h,02h,00h,2Ch,00h,06h,31h,0C0h,04h,26h,06h,89h,05h,02h
-                db      00h,15h,00h,00h,37h,00h,02h,04h,55h,06h,89h,0E5h,02h,06h,89h,0ECh
-                db      04h,5Dh,04h,0CBh,02h,00h,4Ah,00h,00h,43h,00h,00h,50h,00h,14h,00h
-                db      04h,0Eh,04h,0E8h,0Eh,10h,00h,18h,00h,00h,00h,02h,06h,31h,0C0h,04h
-                db      50h,02h,00h,6Fh,00h,04h,0Eh,04h,0E8h,0Eh,10h,00h,1Ch,00h,00h,00h
-                db      02h,00h,02h,00h,00h,15h,00h,00h,44h,00h,00h,4Eh,00h,00h,60h,00h
-                db      00h,75h,00h,02h,04h,55h,06h,89h,0E5h,02h,06h,89h,0ECh,04h,5Dh,04h
-                db      0CBh,02h,00h,97h,00h,00h,84h,00h,0Ch,23h,01h,00h,9Dh,00h,14h,14h
+                db      16h,0Eh,10h,90h,00h,00h,02h,00h,02h,12h,68h,00h,00h,15h,00h,02h
+                db      06h,0C4h,3Eh,0Eh,10h,90h,00h,00h,00h,00h,02h,00h,33h,00h,06h,31h
+                db      0C0h,04h,26h,06h,89h,05h,02h,12h,69h,00h,00h,3Eh,00h,02h,00h,2Ch
+                db      00h,00h,4Ah,00h,12h,6Ah,00h,02h,04h,55h,06h,89h,0E5h,02h,06h,89h
+                db      0ECh,04h,5Dh,04h,0CBh,02h,00h,5Bh,00h,00h,51h,00h,00h,61h,00h,12h
+                db      6Bh,00h,14h,06h,31h,0C0h,04h,50h,02h,00h,76h,00h,04h,0Eh,04h,0E8h
+                db      0Eh,10h,00h,18h,00h,00h,00h,02h,12h,61h,00h,00h,7Ch,00h,02h,06h
+                db      31h,0C0h,04h,50h,02h,00h,92h,00h,04h,0Eh,04h,0E8h,0Eh,10h,00h,1Ch
+                db      00h,00h,00h,02h,12h,62h,00h,00h,98h,00h,02h,00h,15h,00h,00h,29h
 ; Bank B's divisors for the twelve semitones of the lowest octave.
 freqTableB      db      0C0h,0FFh,40h,0F1h,0C0h,0E3h,00h,0D7h,40h,0CBh,80h,0BFh,0C0h,0B4h,80h,0AAh
                 db      00h,0A1h,00h,98h,80h,8Fh,40h,87h
@@ -629,7 +629,7 @@ scripts         db      0FFh,0Ah,03h,00h,0FFh,04h,30h,75h,0FFh,1Ch,0Dh,07h,0FFh,
                 db      00h,00h,00h,00h,80h,0BBh,0FFh,0FFh,0C0h,0E0h,06h,00h,00h,00h,0FFh,0FFh
                 db      00h,00h,00h,00h
 ; The INT 8 handler the driver replaced.
-oldInt8         dd      0A09090Bh
+oldInt8         dd      07000000h
 
 ; InstallSoundTimer -- point INT 8 at timerHandler, saving the old vector, and speed up the timer.
 InstallSoundTimer:

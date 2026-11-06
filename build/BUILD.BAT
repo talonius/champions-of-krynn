@@ -1,6 +1,6 @@
 @ECHO OFF
 REM ==========================================================================
-REM  Champions of Krynn v1.0 -- THE BUILD.
+REM  Champions of Krynn v1.1 -- THE BUILD.
 REM
 REM  Runs under DOS: Borland's TASM and TPC emit the two
 REM  files SSI shipped, START.EXE and GAME.OVR, into E:\OBJ under those names.
@@ -9,9 +9,9 @@ REM  supplies the rebuild mode and output/object directories.
 REM
 REM  Drive letters, assigned by gametools/build.sh. Each tool gets a letter
 REM  rather than a PATH entry: the environment is charged against TPC's link.
-REM      C:  drive_c (game data)       E:  the version dir (v10)
+REM      C:  drive_c (game data)       E:  the version dir (v11)
 REM      D:  TPC.EXE and TURBO.TPL     F:  TASM
-REM      H:  this file's directory (v10/build)
+REM      H:  this file's directory (v11/build)
 REM ==========================================================================
 E:
 CD \SRC

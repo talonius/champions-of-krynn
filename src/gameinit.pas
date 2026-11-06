@@ -112,7 +112,7 @@ begin
   end;
   FillChar(GDVars.symbolSetPtrs, SizeOf(GDVars.symbolSetPtrs), 0);
   FillChar(GDVars.tileSet1, SizeOf(GDVars.tileSet1) + SizeOf(GDVars.tileSet2), 0);
-  Blit.AllocPic(24, 3, 48, 0, GDVars.tileSet1);
+  Blit.AllocPic(24, 3, 40, 0, GDVars.tileSet1);
   FillChar(GDVars.zone0^, SizeOf(GDVars.zone0^), 0);
   GDVars.zone0^.vars[$4CF4] := 3;
   GDVars.zone0^.vars[C_Gbvm.VIEW_3D] := 1;

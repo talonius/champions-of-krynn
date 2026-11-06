@@ -254,10 +254,9 @@ end;
   of six rolls, adjusted for age and held within the race and class limits), sets up spells, starting money and
   first-level hit points, and trains as far as the experience allows; the abilities can be rerolled. It then takes a
   name and an icon and offers to save the character (a knight gets its starting equipment). Escape at any pick abandons
-  it. Note: abandoning frees only the record, not its items and effects; class 12 is missing from the multi-class ages,
-  so it gets no starting age; the racial ability adjustments test the race list's loop counter, which ends at human, so
-  they never apply; and the money step tests the class loop's counter, which ends at the knight, so the per-class
-  average is never taken. }
+  it. Note: the racial ability adjustments test the race list's loop counter, which ends at human, so they never apply;
+  and the money step tests the class loop's counter, which ends at the knight, so the per-class average is never
+  taken. }
 procedure CreateCharacterMenu;
 var
   cr: Types.PCharRecord;
@@ -326,7 +325,7 @@ begin
                                 sel, m);
     if ch = C_Keys.NONE then begin
       MenuCore.FreeStringList(list);
-      FreeMem(cr, SizeOf(Types.TCharRecord));
+      CharGen.FreeCreature(cr);
       Exit;
     end;
   until ch = 'S';
@@ -374,7 +373,7 @@ begin
                                 sel, m);
     if ch = C_Keys.NONE then begin
       MenuCore.FreeStringList(list);
-      FreeMem(cr, SizeOf(Types.TCharRecord));
+      CharGen.FreeCreature(cr);
       Exit;
     end;
   until ch = 'S';
@@ -398,7 +397,7 @@ begin
                                 sel, m);
     if ch = C_Keys.NONE then begin
       MenuCore.FreeStringList(list);
-      FreeMem(cr, SizeOf(Types.TCharRecord));
+      CharGen.FreeCreature(cr);
       Exit;
     end;
   until ch = 'S';
@@ -497,7 +496,7 @@ begin
                                   sel, m);
       if ch = C_Keys.NONE then begin
         MenuCore.FreeStringList(list);
-        FreeMem(cr, SizeOf(Types.TCharRecord));
+        CharGen.FreeCreature(cr);
         Exit;
       end;
     until ch = 'S';
@@ -562,7 +561,7 @@ begin
                                 sel, m);
     if ch = C_Keys.NONE then begin
       MenuCore.FreeStringList(list);
-      FreeMem(cr, SizeOf(Types.TCharRecord));
+      CharGen.FreeCreature(cr);
       Exit;
     end;
   until ch = 'S';
@@ -597,7 +596,8 @@ begin
           age := GDConsts.startAge[race, C_Class.CLERIC].base
                  + GDConsts.startAge[race, C_Class.CLERIC].sides
                    * GDConsts.startAge[race, C_Class.CLERIC].dice;
-        CharGen.CLASS_FIGHTER_MAGE, C_Class.FIGHTER_MAGE_THIEF, C_Class.MAGE_THIEF:
+        CharGen.CLASS_FIGHTER_MAGE, C_Class.FIGHTER_MAGE_THIEF, C_Class.MAGE_THIEF,
+          CharGen.CLASS_CLERIC_THIEF:
           age := GDConsts.startAge[race, C_Class.MAGE].base
                  + GDConsts.startAge[race, C_Class.MAGE].sides
                    * GDConsts.startAge[race, C_Class.MAGE].dice;
@@ -820,13 +820,13 @@ begin
   ch := MenuCore.YesNoMenu('Save ' + Types.PCharRecord(cr)^.name + '? ', LightMagenta, LightGreen, White);
   if ch = 'N' then
   begin
-    FreeMem(cr, SizeOf(Types.TCharRecord));
+    CharGen.FreeCreature(cr);
     GDVars.curChar := savedCur
   end else begin
     if Types.PCharRecord(cr)^.classLevels[C_Class.KNIGHT] > 0 then
       CharGen.InitStartingMoney(cr);
     SaveLoad.SaveChar(cr, '');
-    FreeMem(cr, SizeOf(Types.TCharRecord));
+    CharGen.FreeCreature(cr);
     GDVars.curChar := savedCur
   end
 end;

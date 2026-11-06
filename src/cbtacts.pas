@@ -784,9 +784,9 @@ end;
   attacks are spent. Otherwise att uses its weapon's large-target dice against a large defender, and the defense is the
   rear AC less 4 on a backstab, the rear AC from behind (fromBehind, or def attacked more than once with att at its back
   and a flank spread above 4), else the front AC, plus range penalties. The attacks are rolled from the current attack
-  phase down to 1 until def drops, a hit on a defender still in play running att's condition-2 or condition-3 effects; a
-  miss is reported when no attack hits, and the sweep budget is spent. Note: an attacker that goes down during its
-  attacks loses the rest of that phase's attacks but still makes the next phase's.
+  phase down to 1 until def drops, a hit with damage on a defender still in play running att's condition-2 or
+  condition-3 effects; a miss is reported when no attack hits, and the sweep budget is spent. Note: an attacker that
+  goes down during its attacks loses the rest of that phase's attacks but still makes the next phase's.
   @param(att The creature attacking.)
   @param(def The creature attacked.)
   @param(fromBehind True to attack as from behind.)
@@ -868,7 +868,7 @@ begin
           CbtActs.CalcWeaponDamage(att, def, phase);
           if Types.PCharRecord(def)^.inPlay <> 0 then
             CbtActs.ProcessAttackResult(att, def, atkType, GDVars.currentDamage, GDVars.currentDamage, True);
-          if Types.PCharRecord(def)^.inPlay <> 0 then
+          if (Types.PCharRecord(def)^.inPlay <> 0) and (GDVars.currentDamage > 0) then
             FxEngine.TriggerEffectsWithCondition(phase + 1, att);
           if Types.PCharRecord(def)^.inPlay = 0 then
             defDowned := True;
